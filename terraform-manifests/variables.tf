@@ -157,5 +157,5 @@ variable "web_linuxvm_admin_user" {
   default     = "azureuser"
 }
 
-
+//added some code
 

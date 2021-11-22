@@ -32,6 +32,7 @@ resource "azurerm_network_interface" "web_linuxvm_nic" {
     name                          = "web-linuxvm-ip-1"
     subnet_id                     = azurerm_subnet.websubnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.web_linuxvm_publicip.id
   }
 }
 
@@ -66,7 +67,7 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
   size                = "Standard_DS1_v2"
   admin_username      = "azureuser"
   //network_interface_ids = [azurerm_network_interface.web_linuxvm_nic.id]
-  network_interface_id = azurerm_network_interface.web_linuxvm_nic.id
+  network_interface_ids = [azurerm_network_interface.web_linuxvm_nic.id]
   admin_ssh_key {
     username   = "azureuser"
     public_key = file("${path.module}/ssh-keys/terraform-azure.pub")
@@ -163,7 +164,7 @@ resource "azurerm_lb" "web_lb" {
   sku                 = "Standard"
   frontend_ip_configuration {
     name                 = "web-lb-publicip-1"
-    public_ip_address_id = azurerm_public_ip.web_lbpublicip.id
+    public_ip_address_id = azurerm_public_ip.web_publicip.id
   }
 }
 

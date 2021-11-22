@@ -17,7 +17,15 @@ terraform {
   }
   # Terraform State Storage to Azure Storage Container (Values will be taken from Azure DevOps)
   backend "azurerm" {
-
+    //client_id            = "cb90761c-f02e-4474-91c5-1012308206c8"
+    //client_secret        = "d3b9da20-5cab-4267-9621-35f9875e36ad"
+    //subscription_id      = "50d65e48-cd36-43c6-b861-3b1bcc7804e9"
+    //tenant_id            = "dd152091-7e9a-448e-b6a0-223f687a2d84"
+    //resource_group_name  = "terraform-storage-rg"
+    //container_name       = "tfstatefiles"
+    //key                  = "terraform-manifest-terraform.tfstate"
+    //storage_account_name = "enamstorage"
+    //access_key           = "p1MVHl2TaO3MVbDam8XMoBhY6WinAenYnAAN3uv85jM4/P2lDfQ1Q1PLRXL2YZXrKraZhqpH9mcdryqxUn1pag=="
   }
 }
 

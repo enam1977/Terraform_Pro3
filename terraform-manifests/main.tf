@@ -23,8 +23,8 @@ resource "azurerm_virtual_network" "vnet" {
 
 #create Network interface
 resource "azurerm_network_interface" "web_linuxvm_nic" {
-  count               = var.web_linuxvm_instance_count
-  name                = "${local.resource_name_prefix}-web-linuxvm-nic-${count.index}"
+  //count               = var.web_linuxvm_instance_count
+  name                = "${local.resource_name_prefix}-web-linuxvm-nic"
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = var.resource_group_location
 
@@ -33,17 +33,6 @@ resource "azurerm_network_interface" "web_linuxvm_nic" {
     subnet_id                     = azurerm_subnet.websubnet.id
     private_ip_address_allocation = "Dynamic"
   }
-}
-#create a availaibility ser
-resource "azurerm_availability_set" "ava_set_for_vm" {
-  name                = "ava_set"
-  location            = var.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-
-  tags = local.common_tags
-  //platform_update_domain_count = 5
-  //platform_fault_domain_count  = 5
-  managed = true
 }
 
 # Locals Block for custom data
@@ -69,14 +58,15 @@ CUSTOM_DATA
 
 # # Resource: Azure Linux Virtual Machine
 resource "azurerm_linux_virtual_machine" "web_linuxvm" {
-  count = var.web_linuxvm_instance_count
-  name  = "${local.resource_name_prefix}-web-linuxvm"
+  //count = var.web_linuxvm_instance_count
+  name = "${local.resource_name_prefix}-web-linuxvm"
   #computer_name = "web-linux-vm"  # Hostname of the VM (Optional)
-  resource_group_name   = data.azurerm_resource_group.rg.name
-  location              = var.resource_group_location
-  size                  = "Standard_DS1_v2"
-  admin_username        = "azureuser"
-  network_interface_ids = [azurerm_network_interface.web_linuxvm_nic.id]
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = var.resource_group_location
+  size                = "Standard_DS1_v2"
+  admin_username      = "azureuser"
+  //network_interface_ids = [azurerm_network_interface.web_linuxvm_nic.id]
+  network_interface_id = azurerm_network_interface.web_linuxvm_nic.id
   admin_ssh_key {
     username   = "azureuser"
     public_key = file("${path.module}/ssh-keys/terraform-azure.pub")
@@ -156,15 +146,15 @@ resource "azurerm_network_security_rule" "web_nsg_rule_inbound_80" {
 
 
 # Resource-1: Create Public IP Address for Azure Load Balancer
-resource "azurerm_public_ip" "web_lbpublicip" {
-  name                = "${local.resource_name_prefix}-lbpublicip"
+resource "azurerm_public_ip" "web_publicip" {
+  name                = "${local.resource_name_prefix}-publicip"
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = var.resource_group_location
   allocation_method   = "Static"
   sku                 = "Standard"
   tags                = local.common_tags
 }
-
+/*
 # Resource-2: Create Azure Standard Load Balancer
 resource "azurerm_lb" "web_lb" {
   name                = "${local.resource_name_prefix}-web-lb"
@@ -210,9 +200,9 @@ resource "azurerm_lb_rule" "web_lb_rule_app1" {
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_backend_address_pool_association
 resource "azurerm_network_interface_backend_address_pool_association" "web_nic_lb_associate" {
   //for_each                = var.web_linuxvm_instance_count
-  count                   = var.web_linuxvm_instance_count
-  network_interface_id    = element(azurerm_network_interface.web_linuxvm_nic[*].id, count.index)
-  ip_configuration_name   = azurerm_network_interface.web_linuxvm_nic[count.index].ip_configuration[0].name
+  //count                   = var.web_linuxvm_instance_count
+  network_interface_id    = azurerm_network_interface.web_linuxvm_nic.id
+  ip_configuration_name   = azurerm_network_interface.web_linuxvm_nic.ip_configuration.name
   backend_address_pool_id = azurerm_lb_backend_address_pool.web_lb_backend_address_pool.id
 
 
@@ -224,15 +214,15 @@ resource "azurerm_network_interface_backend_address_pool_association" "web_nic_l
 resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
   depends_on = [azurerm_virtual_machine.vmweb_linuxvmss] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
   //for_each = var.web_linuxvm_instance_count
-  count = var.web_linuxvm_instance_count
-  name  = "vm-${count.index}-ssh-${var.lb_inbound_nat_ports[count.index]}-vm22"
+  //count = var.web_linuxvm_instance_count
+  name  = "vm-${count.index}-ssh-${var.lb_inbound_nat_ports}-vm22"
   #name = "${each.key}-ssh-${each.value}-vm-22"
   protocol      = "Tcp"
-  frontend_port = element(var.lb_inbound_nat_ports, count.index)
+  frontend_port = var.lb_inbound_nat_ports
   #frontend_port = each.value,
   #frontend_port = lookup(var.web_linuxvm_instance_count, each.key)
   backend_port                   = 22
-  frontend_ip_configuration_name = azurerm_lb.web_lb.frontend_ip_configuration[0].name
+  frontend_ip_configuration_name = azurerm_lb.web_lb.frontend_ip_configuration.name
   resource_group_name            = data.azurerm_resource_group.rg.name
   loadbalancer_id                = azurerm_lb.web_lb.id
 }
@@ -240,10 +230,10 @@ resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
 # Associate LB NAT Rule and VM Network Interface
 resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_associate" {
   #for_each              = var.web_linuxvm_instance_count
-  count                 = var.web_linuxvm_instance_count
-  network_interface_id  = element(azurerm_network_interface.web_linuxvm_nic[*].id, count.index)
-  ip_configuration_name = element(azurerm_network_interface.web_linuxvm_nic[*].ip_configuration[0].name, count.index)
-  nat_rule_id           = element(azurerm_lb_nat_rule.web_lb_inbound_nat_rule_22[*].id, count.index)
+  //count                 = var.web_linuxvm_instance_count
+  network_interface_id  = azurerm_network_interface.web_linuxvm_nic.id
+  ip_configuration_name = azurerm_network_interface.web_linuxvm_nic.ip_configuration.name
+  nat_rule_id           =azurerm_lb_nat_rule.web_lb_inbound_nat_rule_22.id
 
 }
 
@@ -251,3 +241,4 @@ resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_asso
 //https://docs.microsoft.com/en-us/azure/developer/terraform/create-vm-cluster-with-infrastructure
 
 
+*/

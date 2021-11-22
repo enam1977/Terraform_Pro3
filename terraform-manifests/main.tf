@@ -32,7 +32,7 @@ resource "azurerm_network_interface" "web_linuxvm_nic" {
     name                          = "web-linuxvm-ip-1"
     subnet_id                     = azurerm_subnet.websubnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.web_linuxvm_publicip.id
+    public_ip_address_id          = [azurerm_public_ip.web_linuxvm_publicip.id]
   }
 }
 
@@ -213,7 +213,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "web_nic_l
 
 # Azure LB Inbound NAT Rule
 resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
-  depends_on = [azurerm_virtual_machine.vmweb_linuxvmss] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
+  depends_on = [azurerm_virtual_machine.web_linuxvm] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
   //for_each = var.web_linuxvm_instance_count
   //count = var.web_linuxvm_instance_count
   name = "vm-${count.index}-ssh-${var.lb_inbound_nat_ports}-vm22"
@@ -223,7 +223,7 @@ resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
   #frontend_port = each.value,
   #frontend_port = lookup(var.web_linuxvm_instance_count, each.key)
   backend_port                   = 22
-  frontend_ip_configuration_name = azurerm_lb.web_lb.frontend_ip_configuration.name
+  frontend_ip_configuration_name = azurerm_lb.web_lb.frontend_ip_configuration[0].name
   resource_group_name            = data.azurerm_resource_group.rg.name
   loadbalancer_id                = azurerm_lb.web_lb.id
 }

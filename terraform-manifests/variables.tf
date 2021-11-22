@@ -29,7 +29,7 @@ provider "azurerm" {
   #client_secret: "NyySxNK1.-cBcGZTtcCp9vHwv6D4mUyapO",
   features {}
 }
-# simple
+# simple e aded to chek
 
 # Generic Input Variables
 # Business Division

@@ -71,11 +71,11 @@ CUSTOM_DATA
 resource "azurerm_linux_virtual_machine" "web_linuxvm" {
   name = "${local.resource_name_prefix}-web-linuxvm"
   #computer_name = "web-linux-vm"  # Hostname of the VM (Optional)
-  resource_group_name   = azurerm_resource_group.rg.name
-  location              = azurerm_resource_group.rg.location
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  location              = var.resource_group_location
   size                  = "Standard_DS1_v2"
   admin_username        = "azureuser"
-  network_interface_ids = [azurerm_network_interface.web_linuxvm_nic.id]
+  network_interface_ids = [azurerm_network_interface.web_linuxvm_nic[count.index].id]
   admin_ssh_key {
     username   = "azureuser"
     public_key = file("${path.module}/ssh-keys/terraform-azure.pub")
@@ -221,7 +221,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "web_nic_l
 
 # Azure LB Inbound NAT Rule
 resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
-  depends_on = [azurerm_virtual_machine.vmss] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
+  depends_on = [azurerm_virtual_machine.vmweb_linuxvmss] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
   //for_each = var.web_linuxvm_instance_count
   count = var.web_linuxvm_instance_count
   name  = "vm-${count.index}-ssh-${var.lb_inbound_nat_ports[count.index]}-vm22"

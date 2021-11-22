@@ -1,6 +1,6 @@
 business_divsion        = "ATT"
 environment             = "dev"
-resource_group_name     = "Udacity_rg"
+resource_group_name     = "Udterraform-storage-rg"
 resource_group_location = "East US"
 vnet_name               = "vnet"
 vnet_address_space      = ["10.1.0.0/16"]

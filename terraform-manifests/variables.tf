@@ -24,6 +24,9 @@ terraform {
 # Provider Block
 provider "azurerm" {
   tenant_id = "dd152091-7e9a-448e-b6a0-223f687a2d84"
+
+  #client_id: "698c36ba-5f91-4d2c-9993-76a5da21eb06",
+  #client_secret: "NyySxNK1.-cBcGZTtcCp9vHwv6D4mUyapO",
   features {}
 }
 

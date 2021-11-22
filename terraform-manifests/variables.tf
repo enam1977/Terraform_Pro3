@@ -24,8 +24,8 @@ terraform {
     //resource_group_name  = "terraform-storage-rg"
     //container_name       = "tfstatefiles"
     //key                  = "terraform-manifest-terraform.tfstate"
-    //storage_account_name = "enamstorage"
-    //access_key           = "p1MVHl2TaO3MVbDam8XMoBhY6WinAenYnAAN3uv85jM4/P2lDfQ1Q1PLRXL2YZXrKraZhqpH9mcdryqxUn1pag=="
+    //storage_account_name = "udacitystorage"
+    //access_key           = "dtGqN18sYg0y+2MoJE91LubVKQtxbCI/E7X/fkcNdWz/ftKR/eGu6xtMlvEJTtszlWeuAQN/zXmbqRVCnuiggw=="
   }
 }
 

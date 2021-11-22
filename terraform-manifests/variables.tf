@@ -120,12 +120,6 @@ variable "web_subnet_address" {
   default     = ["10.0.1.0/24"]
 }
 
-#weblinux Vm instance count
-variable "web_linuxvm_instance_count" {
-  description = "total instance count "
-  type        = number
-  default     = 1
-}
 #web linux inbound NAT port for all VMs
 variable "lb_inbound_nat_ports" {
   description = "Web LB Inbound NAT Ports List"

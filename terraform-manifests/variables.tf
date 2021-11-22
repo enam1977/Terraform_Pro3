@@ -92,18 +92,6 @@ locals {
   }
 }
 
-variable "server_name" {
-  description = "name of the server"
-  default     = "packer"
-}
-
-# Packer image variable declare
-variable "packer_image_name" {
-  description = "Name of the created packer image"
-  type        = string
-  default     = "Udemy_PackerImage"
-
-}
 # Virtual Network, Subnets and Subnet NSG's
 
 ## Virtual Network

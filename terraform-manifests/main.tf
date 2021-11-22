@@ -154,7 +154,7 @@ resource "azurerm_public_ip" "web_publicip" {
   sku                 = "Standard"
   tags                = local.common_tags
 }
-/*
+
 # Resource-2: Create Azure Standard Load Balancer
 resource "azurerm_lb" "web_lb" {
   name                = "${local.resource_name_prefix}-web-lb"
@@ -215,7 +215,7 @@ resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
   depends_on = [azurerm_virtual_machine.vmweb_linuxvmss] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
   //for_each = var.web_linuxvm_instance_count
   //count = var.web_linuxvm_instance_count
-  name  = "vm-${count.index}-ssh-${var.lb_inbound_nat_ports}-vm22"
+  name = "vm-${count.index}-ssh-${var.lb_inbound_nat_ports}-vm22"
   #name = "${each.key}-ssh-${each.value}-vm-22"
   protocol      = "Tcp"
   frontend_port = var.lb_inbound_nat_ports
@@ -233,7 +233,7 @@ resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_asso
   //count                 = var.web_linuxvm_instance_count
   network_interface_id  = azurerm_network_interface.web_linuxvm_nic.id
   ip_configuration_name = azurerm_network_interface.web_linuxvm_nic.ip_configuration.name
-  nat_rule_id           =azurerm_lb_nat_rule.web_lb_inbound_nat_rule_22.id
+  nat_rule_id           = azurerm_lb_nat_rule.web_lb_inbound_nat_rule_22.id
 
 }
 
@@ -241,4 +241,4 @@ resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_asso
 //https://docs.microsoft.com/en-us/azure/developer/terraform/create-vm-cluster-with-infrastructure
 
 
-*/
+

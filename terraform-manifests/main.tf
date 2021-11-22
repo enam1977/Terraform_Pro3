@@ -245,7 +245,7 @@ resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_asso
 resource "azurerm_app_service_plan" "test" {
   name                = "${var.application_type}-${var.resource_type}"
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   sku {
     tier = "Free"
@@ -256,7 +256,7 @@ resource "azurerm_app_service_plan" "test" {
 resource "azurerm_app_service" "test" {
   name                = "${var.application_type}-${var.resource_type}"
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = data.azurerm_resource_group.rg.name
   app_service_plan_id = azurerm_app_service_plan.test.id
 
   app_settings = {

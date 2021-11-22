@@ -10,7 +10,15 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 
 }
-
+# Resource-1: Create Public IP Address for Azure Load Balancer
+resource "azurerm_public_ip" "web_publicip" {
+  name                = "${local.resource_name_prefix}-publicip"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = var.resource_group_location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  tags                = local.common_tags
+}
 
 # Create Virtual Network
 resource "azurerm_virtual_network" "vnet" {
@@ -32,7 +40,7 @@ resource "azurerm_network_interface" "web_linuxvm_nic" {
     name                          = "web-linuxvm-ip-1"
     subnet_id                     = azurerm_subnet.websubnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = [azurerm_public_ip.web_linuxvm_publicip.id]
+    public_ip_address_id          = [azurerm_public_ip.web_publicip.id]
   }
 }
 
@@ -146,15 +154,7 @@ resource "azurerm_network_security_rule" "web_nsg_rule_inbound_80" {
 
 
 
-# Resource-1: Create Public IP Address for Azure Load Balancer
-resource "azurerm_public_ip" "web_publicip" {
-  name                = "${local.resource_name_prefix}-publicip"
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = var.resource_group_location
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  tags                = local.common_tags
-}
+
 
 # Resource-2: Create Azure Standard Load Balancer
 resource "azurerm_lb" "web_lb" {
@@ -213,10 +213,10 @@ resource "azurerm_network_interface_backend_address_pool_association" "web_nic_l
 
 # Azure LB Inbound NAT Rule
 resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
-  depends_on = [azurerm_virtual_machine.web_linuxvm] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
+  depends_on = [azurerm_linux_virtual_machine.web_linuxvm] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
   //for_each = var.web_linuxvm_instance_count
   //count = var.web_linuxvm_instance_count
-  name = "vm-${count.index}-ssh-${var.lb_inbound_nat_ports}-vm22"
+  name = "vm-ssh-${var.lb_inbound_nat_ports}-vm22"
   #name = "${each.key}-ssh-${each.value}-vm-22"
   protocol      = "Tcp"
   frontend_port = var.lb_inbound_nat_ports

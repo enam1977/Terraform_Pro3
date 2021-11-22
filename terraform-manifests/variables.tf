@@ -52,7 +52,7 @@ variable "packer_resource_group_name" {
 variable "resource_group_name" {
   description = "name of the resource group name"
   //type        = string
-  default = "Udacity_rg"
+  default = "terraform-storage-rg"
 }
 # Azure Resources Location
 variable "resource_group_location" {

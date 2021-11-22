@@ -69,13 +69,14 @@ CUSTOM_DATA
 
 # # Resource: Azure Linux Virtual Machine
 resource "azurerm_linux_virtual_machine" "web_linuxvm" {
-  name = "${local.resource_name_prefix}-web-linuxvm"
+  count = var.web_linuxvm_instance_count
+  name  = "${local.resource_name_prefix}-web-linuxvm"
   #computer_name = "web-linux-vm"  # Hostname of the VM (Optional)
   resource_group_name   = data.azurerm_resource_group.rg.name
   location              = var.resource_group_location
   size                  = "Standard_DS1_v2"
   admin_username        = "azureuser"
-  network_interface_ids = [azurerm_network_interface.web_linuxvm_nic[count.index].id]
+  network_interface_ids = [azurerm_network_interface.web_linuxvm_nic.id]
   admin_ssh_key {
     username   = "azureuser"
     public_key = file("${path.module}/ssh-keys/terraform-azure.pub")

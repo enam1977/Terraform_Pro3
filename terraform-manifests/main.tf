@@ -154,7 +154,7 @@ resource "azurerm_network_security_rule" "web_nsg_rule_inbound_80" {
 
 
 
-
+/*
 
 # Resource-2: Create Azure Standard Load Balancer
 resource "azurerm_lb" "web_lb" {
@@ -238,6 +238,7 @@ resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_asso
 
 }
 
+*/
 
 //https://docs.microsoft.com/en-us/azure/developer/terraform/create-vm-cluster-with-infrastructure
 

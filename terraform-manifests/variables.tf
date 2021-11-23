@@ -141,5 +141,5 @@ variable "web_linuxvm_admin_user" {
 
 variable "application_type" {}
 variable "resource_type" {}
-//break leased
+//removed
 

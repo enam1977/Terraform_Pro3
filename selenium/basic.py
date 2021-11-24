@@ -1,13 +1,18 @@
 from selenium import webdriver
-#from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import presence_of_element_located
 
 # Start the browser and navigate to http://automationpractice.com/index.php.
 url = 'http://automationpractice.com/index.php'
 driver = webdriver.Chrome(
-    "/Users/enamulhaque/Documents/AzureDevops/Udacity/Project3/selenium/chromedriver")
+    "/Users/enamulhaque/Documents/AzureDevops/Udacity/Project3/Terraform_Pro3/selenium/chromedriver")
 driver.get(url)
+wait = WebDriverWait(driver, 10)
 print("my website name is" + url)
 search_item = "DRESS"
+
 driver.find_element_by_css_selector(
     "input[id='search_query_top']").send_keys(search_item)
 driver.find_element_by_css_selector(

@@ -11,7 +11,7 @@ web_subnet_address = ["10.1.1.0/24"]
 //packer_image_name          = "Udemy_PackerImage"
 //web_linuxvm_instance_count = 1
 lb_inbound_nat_ports = ["1022", "2022"]
-application_type     = "web-app"
+application_type     = "webapp"
 resource_type        = "webappservice"
 
 

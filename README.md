@@ -187,10 +187,10 @@ https://ooeid-omar.medium.com/ensuring-quality-release-using-microsoft-azure-4fd
 
 
 
-Postman expain
+How postman works explains good
 
 https://www.youtube.com/watch?v=VywxIQ2ZXw4&t=1117s
 
 
 this one well explain what to do well
-https://ganeshsirsi.medium.com/how-to-configure-postman-newman-api-tests-in-azure-devops-or-tfs-and-publish-html-results-caf60a25c8b9
+https://ganeshsirsi.medium.com/how-to-configure-postman-newman-api-tests-in-azure-devops-or-tfs-and-publish-html-results-caf60a25c8b9 

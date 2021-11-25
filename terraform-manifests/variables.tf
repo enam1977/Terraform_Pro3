@@ -33,7 +33,7 @@ terraform {
 provider "azurerm" {
   features {}
 }
-# simple e aded to chek
+
 
 # Generic Input Variables
 # Business Division

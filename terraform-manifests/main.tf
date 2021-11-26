@@ -155,7 +155,6 @@ resource "azurerm_network_security_rule" "web_nsg_rule_inbound_80" {
 
 
 /*
-
 # Resource-2: Create Azure Standard Load Balancer
 resource "azurerm_lb" "web_lb" {
   name                = "${local.resource_name_prefix}-web-lb"
@@ -167,13 +166,11 @@ resource "azurerm_lb" "web_lb" {
     public_ip_address_id = azurerm_public_ip.web_publicip.id
   }
 }
-
 # Resource-3: Create LB Backend Pool
 resource "azurerm_lb_backend_address_pool" "web_lb_backend_address_pool" {
   name            = "web-backend"
   loadbalancer_id = azurerm_lb.web_lb.id
 }
-
 # Resource-4: Create LB Probe
 resource "azurerm_lb_probe" "web_lb_probe" {
   name                = "tcp-probe"
@@ -182,7 +179,6 @@ resource "azurerm_lb_probe" "web_lb_probe" {
   loadbalancer_id     = azurerm_lb.web_lb.id
   resource_group_name = data.azurerm_resource_group.rg.name
 }
-
 # Resource-5: Create LB Rule
 resource "azurerm_lb_rule" "web_lb_rule_app1" {
   name                           = "web-app1-rule"
@@ -195,8 +191,6 @@ resource "azurerm_lb_rule" "web_lb_rule_app1" {
   loadbalancer_id                = azurerm_lb.web_lb.id
   resource_group_name            = data.azurerm_resource_group.rg.name
 }
-
-
 # Resource-6: Associate Network Interface and Standard Load Balancer
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_backend_address_pool_association
 resource "azurerm_network_interface_backend_address_pool_association" "web_nic_lb_associate" {
@@ -205,12 +199,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "web_nic_l
   network_interface_id    = azurerm_network_interface.web_linuxvm_nic.id
   ip_configuration_name   = azurerm_network_interface.web_linuxvm_nic.ip_configuration.name
   backend_address_pool_id = azurerm_lb_backend_address_pool.web_lb_backend_address_pool.id
-
-
 }
-
-
-
 # Azure LB Inbound NAT Rule
 resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
   depends_on = [azurerm_linux_virtual_machine.web_linuxvm] # To effectively handle azurerm provider related dependency bugs during the destroy resources time
@@ -227,7 +216,6 @@ resource "azurerm_lb_nat_rule" "web_lb_inbound_nat_rule_22" {
   resource_group_name            = data.azurerm_resource_group.rg.name
   loadbalancer_id                = azurerm_lb.web_lb.id
 }
-
 # Associate LB NAT Rule and VM Network Interface
 resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_associate" {
   #for_each              = var.web_linuxvm_instance_count
@@ -235,9 +223,7 @@ resource "azurerm_network_interface_nat_rule_association" "web_nic_nat_rule_asso
   network_interface_id  = azurerm_network_interface.web_linuxvm_nic.id
   ip_configuration_name = azurerm_network_interface.web_linuxvm_nic.ip_configuration.name
   nat_rule_id           = azurerm_lb_nat_rule.web_lb_inbound_nat_rule_22.id
-
 }
-
 */
 
 //https://docs.microsoft.com/en-us/azure/developer/terraform/create-vm-cluster-with-infrastructure
@@ -263,4 +249,3 @@ resource "azurerm_app_service" "test" {
     "WEBSITE_RUN_FROM_PACKAGE" = 0
   }
 }
-

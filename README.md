@@ -194,3 +194,25 @@ https://www.youtube.com/watch?v=VywxIQ2ZXw4&t=1117s
 
 this one well explain what to do well
 https://ganeshsirsi.medium.com/how-to-configure-postman-newman-api-tests-in-azure-devops-or-tfs-and-publish-html-results-caf60a25c8b9 
+
+## creating VM in the pipelien
+
+https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments-virtual-machines?view=azure-devops
+
+
+As Kyaw mentioned, the VM is configured on the environment section so that the pipeline can communicate with it. Below are some simple steps.
+
+- Click Create Environment.
+
+- Specify a Name (required) for the environment and a Description.
+
+- Choose Virtual Machines as a Resource to be added to the environment and click Next.
+
+- Choose Windows or Linux for the Operating System.
+
+- Copy the registration script.
+
+- Run the copied script from an administrator PowerShell command prompt on each of the target VMs that you want to register with this environment.
+
+
+The VM is used in this project to run the Selenium tests, so your terraform needs to create a VM able to run selenium tests. Since it will run in Azure Pipelines you need to run the selenium tests in headless mode.

@@ -1,0 +1,90 @@
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: main
+jobs:
+- job: Job_1
+  displayName: Selenium Python pipeline
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - checkout: self
+    clean: true
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.8
+    inputs:
+      versionSpec: 3.8
+  - task: CmdLine@2
+    displayName: Install Plugins
+    inputs:
+      script: "python -m pip install --upgrade pip\npip install selenium\npip install pytest\npip install pytest-html\npip install chromedriver-py==88.0.4324.96\npip install pytest-xdist\npip install pytest-nunit\nsudo apt install google-chrome-stable\npip install webdriver_manager\n\nsudo apt-get install software-properties-common -y\n\nsudo apt-add-repository universe -y\n\nsudo apt-get update -y\n\nsudo apt-get install python3-pip -y\n\nsudo apt-get install unzip -y\n\nsudo apt-get install -y chromium-browser\n\nsudo apt-get install -y chromium-chromedriver\n\npython3 -m pip install --upgrade pip\n\npip3 install selenium\n\nsudo apt-get upgrade -y\nsudo apt-get install python3-pip -y\nsudo apt-get install unzip -y       \nsudo apt-get install -y chromium-browser    \npip3 install selenium "
+  - task: CmdLine@2
+    displayName: Run Python Test
+    inputs:
+      script: >-
+        sudo rm -rf chromedriver*
+
+        wget https://chromedriver.storage.googleapis.com/<version>/chromedriver_linux64.zip //update the version here
+
+        unzip chromedriver*.zip
+
+        sudo mv chromedriver -f /usr/bin
+
+
+        pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml  || true
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Pipeline Artifact
+    inputs:
+      artifactName: Test_reports
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      testRunner: NUnit
+      testResultsFiles: '**/*-results.xml'
+  - task: publishhtmlreport@1
+    displayName: publish html report
+    inputs:
+      htmlType: HTML-Report
+...
+From a student
+
+- deployment: VMDeploy
+    displayName: deploy virtual machine
+    environment:
+      name: 'UD -Testing environment'
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            displayName: 'Download Selenium'
+            artifact: selenium
+          - task: Bash@3
+            displayName: selenium Tests
+            inputs:
+              targetType: 'inline'
+              script: |
+                #! /bin/bash
+                sudo apt-get install software-properties-common -y
+                sudo apt-add-repository universe -y
+                sudo apt-get update -y
+                sudo apt-get install python3-pip -y
+                sudo apt-get install unzip -y
+                sudo apt-get install -y chromium-browser
+                sudo apt-get install -y chromium-chromedriver
+                python3 -m pip install --upgrade pip
+                pip3 install selenium
+                python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
+                chromium-browser -version
+                chromedriver --version
+                wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w dbf2bd83-6d47-436b-a499-a2b566def8fe -s MuSR8Ti5MMi0E+9+1NM4NxCxFqJcfLzuGD0EtGhjXo3Vhy/THcSdCf1WyQnkXafD+6DiFjiOAEfJiQh6EbZVeg== -d opinsights.azure.com
+                unzip -o $(Pipeline.Workspace)/selenium/selenium-ui-tests.zip -d .
+                
+ #               mkdir -p ~/vmlogs
+#unbuffer python3 login.py | tee -a ~/vmlogs/log.txt
+
+                sudo mkdir /var/logs_
+                sudo python3 selenium_ui_test.py > selenium-ui-logs.log
+                sudo mv selenium-ui-logs.log /var/logs_

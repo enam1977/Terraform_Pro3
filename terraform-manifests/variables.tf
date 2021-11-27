@@ -1,77 +1,5 @@
-# Terraform Block
-terraform {
-  required_version = ">= 1.0.0"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 2.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.0"
-    }
-    null = {
-      source  = "hashicorp/null"
-      version = ">= 3.0"
-    }
-  }
-  # Terraform State Storage to Azure Storage Container (Values will be taken from Azure DevOps)
-  backend "azurerm" {
-
-    //resource_group_name  = "terraform-storage-rg"
-    //container_name       = "tfstatefiles"
-    //key                  = "terraform-manifest-terraform.tfstate"
-    //storage_account_name = "udacitystorage"
-    //access_key           = "dtGqN18sYg0y+2MoJE91LubVKQtxbCI/E7X/fkcNdWz/ftKR/eGu6xtMlvEJTtszlWeuAQN/zXmbqRVCnuiggw=="
-    //this is not required for 
-  }
-}
-
-# Provider Block
-provider "azurerm" {
-  features {}
-  //client_id     = "3a55cc2f-6f87-4fb4-9258-28f637136ee6"
-  //client_secret = "pX0aa.CpU._R1ZEqPoEUM3NxHi1AcoGnbB"
-  //tenant_id     = "dd152091-7e9a-448e-b6a0-223f687a2d84"
-}
 
 
-//client_id       = "cb90761c-f02e-4474-91c5-1012308206c8"
-//client_secret   = "d3b9da20-5cab-4267-9621-35f9875e36ad"
-//subscription_id = "50d65e48-cd36-43c6-b861-3b1bcc7804e9"
-//tenant_id       = "dd152091-7e9a-448e-b6a0-223f687a2d84"
-
-
-
-# Generic Input Variables
-# Business Division
-variable "business_divsion" {
-  description = "Business Division in the large organization this Infrastructure belongs"
-  type        = string
-  default     = "radio"
-}
-# Environment Variable
-variable "environment" {
-  description = "Environment Variable used as a prefix"
-  type        = string
-  default     = "uda"
-}
-
-variable "packer_resource_group_name" {
-  description = "Name of the resource group in which the Packer image will be created"
-  default     = "Udacity_rg"
-}
-variable "resource_group_name" {
-  description = "name of the resource group name"
-  //type        = string
-  default = "terraform-storage-rg"
-}
-# Azure Resources Location
-variable "resource_group_location" {
-  description = "Region in which Azure Resources to be created"
-  //type        = string
-  default = "East US"
-}
 variable "location" {
   default     = "East us"
   description = "Location where resources will be created"
@@ -87,18 +15,6 @@ variable "admin_password" {
   default     = "Allah@123"
 }
 
-
-# Define Local Values in Terraform
-locals {
-  owners               = var.business_divsion
-  environment          = var.environment
-  resource_name_prefix = "${var.business_divsion}-${var.environment}"
-  #name = "${local.owners}-${local.environment}"
-  common_tags = {
-    owners      = local.owners
-    environment = local.environment
-  }
-}
 
 # Virtual Network, Subnets and Subnet NSG's
 

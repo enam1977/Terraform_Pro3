@@ -14,11 +14,7 @@ terraform {
   }
   # Terraform State Storage to Azure Storage Container (Values will be taken from Azure DevOps)
   backend "azurerm" {
-    storage_account_name = "udacitystorage"
-    key                  = "dev-terraform.tfstate"
-    container_name       = "tfstatefiles"
-    tenant_id            = "dd152091-7e9a-448e-b6a0-223f687a2d84"
-    access_key           = "dtGqN18sYg0y+2MoJE91LubVKQtxbCI/E7X/fkcNdWz/ftKR/eGu6xtMlvEJTtszlWeuAQN/zXmbqRVCnuiggw=="
+
   }
 }
 
@@ -26,7 +22,7 @@ terraform {
 
 # Provider Block
 provider "azurerm" {
-  tenant_id = "dd152091-7e9a-448e-b6a0-223f687a2d84"
+
   features {}
 }
 

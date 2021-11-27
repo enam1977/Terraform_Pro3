@@ -20,7 +20,7 @@ terraform {
 
 
 
-# Provider Block
+# Provider Block of azure
 provider "azurerm" {
 
   features {}

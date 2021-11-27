@@ -1,5 +1,67 @@
 
+# Terraform Block
+terraform {
+  required_version = ">= 1.0.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 2.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
+  }
+  # Terraform State Storage to Azure Storage Container (Values will be taken from Azure DevOps)
+  backend "azurerm" {
 
+  }
+}
+
+
+
+# Provider Block
+provider "azurerm" {
+
+  features {}
+}
+
+# Define Local Values in Terraform
+locals {
+  owners               = var.business_divsion
+  environment          = var.environment
+  resource_name_prefix = "${var.business_divsion}-${var.environment}"
+  #name = "${local.owners}-${local.environment}"
+  common_tags = {
+    owners      = local.owners
+    environment = local.environment
+  }
+}
+
+# Generic Input Variables
+# Business Division
+variable "business_divsion" {
+  description = "Business Division in the large organization this Infrastructure belongs"
+  type        = string
+  default     = "radio"
+}
+# Environment Variable
+variable "environment" {
+  description = "Environment Variable used as a prefix"
+  type        = string
+  default     = "uda"
+}
+variable "resource_group_name" {
+  description = "name of the resource group name"
+  //type        = string
+  default = "terraform-storage-rg"
+}
+# Azure Resources Location
+variable "resource_group_location" {
+  description = "Region in which Azure Resources to be created"
+  //type        = string
+  default = "East US"
+}
 variable "location" {
   default     = "East us"
   description = "Location where resources will be created"
@@ -14,7 +76,6 @@ variable "admin_password" {
   description = "Default password for admin account"
   default     = "Allah@123"
 }
-
 
 # Virtual Network, Subnets and Subnet NSG's
 

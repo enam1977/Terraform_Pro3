@@ -242,3 +242,13 @@ Private Key: terraform-azure.pem
 
 # Permissions for Pem file
 chmod 400 terraform-azure.pem
+
+
+nams-MacBook-Pro:terraform-manifests enamulhaque$ export ARM_CLIENT_ID="3a55cc2f-6f87-4fb4-9258-28f637136ee6"
+Enams-MacBook-Pro:terraform-manifests enamulhaque$ export ARM_TENANT_ID="dd152091-7e9a-448e-b6a0-223f687a2d84"
+Enams-MacBook-Pro:terraform-manifests enamulhaque$ export ARM_SECRET_ID="0b049f26-84b7-4a8e-b693-dc0ec1d36067"
+Enams-MacBook-Pro:terraform-manifests enamulhaque$ export ARM_SUBSCRIPTION_ID="50d65e48-cd36-43c6-b861-3b1bcc7804e9"
+
+
+## Install SSH Key task
+https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/install-ssh-key?view=azure-devops

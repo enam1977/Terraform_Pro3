@@ -85,10 +85,11 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
     storage_account_type = "Standard_LRS"
   }
   source_image_reference {
-    publisher = "RedHat"
-    offer     = "RHEL"
-    sku       = "83-gen2"
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "20.04-LTS"
     version   = "latest"
+  }
   }
   #custom_data = filebase64("${path.module}/app-scripts/redhat-webvm-script.sh")    
   custom_data = base64encode(local.webvm_custom_data)

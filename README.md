@@ -252,3 +252,9 @@ Enams-MacBook-Pro:terraform-manifests enamulhaque$ export ARM_SUBSCRIPTION_ID="5
 
 ## Install SSH Key task
 https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/install-ssh-key?view=azure-devops
+
+
+
+https://github.com/zhulingchen/Azure-Cloud-DevOps-Ensuring-Quality-Releases/blob/main/README.md
+
+https://github.com/acouprie/udacity-azure-project3/blob/master/README.md

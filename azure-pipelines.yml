@@ -27,7 +27,7 @@ stages:
       inputs:
         knownHostsEntry: 'known_hosts'
         sshPublicKey: $(PUBLIC_KEY)
-        sshKeySecureFile: 'terraform_azure'
+        sshKeySecureFile: 'terraform-azure'
 
     - bash: |
         cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/

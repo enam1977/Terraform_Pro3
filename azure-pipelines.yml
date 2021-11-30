@@ -39,7 +39,7 @@ stages:
         cd $(Agent.TempDirectory)
         pwd
         ls -la
-        cat udacity_azure.pub
+        cat terraform-azure.pub
         cd ~/.ssh/
         pwd
         ls -la
@@ -59,10 +59,10 @@ stages:
     pool:
       vmImage: 'ubuntu-18.04'
     steps:
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-      displayName: 'Install Terraform 1.0.11'
+    - task: TerraformInstaller@0
+      displayName: 'Install Terraform 1.0.10'
       inputs:
-        terraformVersion: 1.0.11'
+        terraformVersion: "1.0.10"
 
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
       displayName: 'Terraform : init'

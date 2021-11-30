@@ -258,3 +258,6 @@ https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/install-ss
 https://github.com/zhulingchen/Azure-Cloud-DevOps-Ensuring-Quality-Releases/blob/main/README.md
 
 https://github.com/acouprie/udacity-azure-project3/blob/master/README.md
+
+
+https://dev.azure.com/enambd/Terraform_Project3/_build/results?buildId=500&view=artifacts&pathAsName=false&type=publishedArtifacts

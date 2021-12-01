@@ -54,47 +54,47 @@ stages:
           # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
           
 
-  - stage: Build_FakeRestAPI
-    jobs:
-      - job: build_artifacts_FakeRestAPI
-        displayName: Artifacts_FakeRestAPI
-        pool:
-          vmImage: "ubuntu-18.04"
-        steps:
-          - task: ArchiveFiles@2
-            displayName: Archive FakeRestAPI
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/jmeter/fakerestapi"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
-              verbose: true
-          - task: PublishPipelineArtifact@1
-            displayName: Publish FakeRestAPI artifact
-            inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
-              artifactName: "drop-fakerestapi"
-  - stage: Build_Selenium
-    jobs:
-      - job: build_artifacts_Selenium
-        displayName: Artifacts_Selenium
-        pool:
-          vmImage: "ubuntu-18.04"
-        steps:
-          - task: ArchiveFiles@2
-            displayName: Archive Selenium
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/selenium"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
-              verbose: true
+  # - stage: Build_FakeRestAPI
+  #   jobs:
+  #     - job: build_artifacts_FakeRestAPI
+  #       displayName: Artifacts_FakeRestAPI
+  #       pool:
+  #         vmImage: "ubuntu-18.04"
+  #       steps:
+  #         - task: ArchiveFiles@2
+  #           displayName: Archive FakeRestAPI
+  #           inputs:
+  #             rootFolderOrFile: "$(System.DefaultWorkingDirectory)/jmeter/fakerestapi"
+  #             includeRootFolder: false
+  #             archiveType: "zip"
+  #             archiveFile: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
+  #             verbose: true
+  #         - task: PublishPipelineArtifact@1
+  #           displayName: Publish FakeRestAPI artifact
+  #           inputs:
+  #             targetPath: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
+  #             artifactName: "drop-fakerestapi"
+  # - stage: Build_Selenium
+  #   jobs:
+  #     - job: build_artifacts_Selenium
+  #       displayName: Artifacts_Selenium
+  #       pool:
+  #         vmImage: "ubuntu-18.04"
+  #       steps:
+  #         - task: ArchiveFiles@2
+  #           displayName: Archive Selenium
+  #           inputs:
+  #             rootFolderOrFile: "$(System.DefaultWorkingDirectory)/selenium"
+  #             includeRootFolder: false
+  #             archiveType: "zip"
+  #             archiveFile: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+  #             verbose: true
 
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Selenium artifact
-            inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
-              artifactName: "drop-selenium"
+  #         - task: PublishPipelineArtifact@1
+  #           displayName: Publish Selenium artifact
+  #           inputs:
+  #             targetPath: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+  #             artifactName: "drop-selenium"
   - stage: Build_terraform
     jobs:
       - job: build_artifacts_terraform
@@ -118,23 +118,23 @@ stages:
               artifactName: "drop-terraform"
   - stage: Deployment
     jobs:
-        - deployment: deployment_fakerestapi
-          displayName: Deploy FakeRestAPI
-          pool:
-            vmImage: "ubuntu-18.04"
-          environment: "udacity"
-          strategy:
-            runOnce:
-              deploy:
-                steps:
-                - task: AzureWebApp@1
-                  displayName: Deploy Azure WebApp
-                  inputs:
-                    azureSubscription: "enamul01"
-                    appName: "webapp-webappservice"
-                    appType: webApp
-                    package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
-                    deploymentMethod: zipDeploy
+        # - deployment: deployment_fakerestapi
+        #   displayName: Deploy FakeRestAPI
+        #   pool:
+        #     vmImage: "ubuntu-18.04"
+        #   environment: "udacity"
+        #   strategy:
+        #     runOnce:
+        #       deploy:
+        #         steps:
+        #         - task: AzureWebApp@1
+        #           displayName: Deploy Azure WebApp
+        #           inputs:
+        #             azureSubscription: "enamul01"
+        #             appName: "webapp-webappservice"
+        #             appType: webApp
+        #             package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
+        #             deploymentMethod: zipDeploy
 
         - deployment: deployment_vm
           displayName: Deploy Virtual Machine

@@ -1,0 +1,118 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - README.md
+      - .gitignore
+      - screenshots/
+
+stages:
+  - stage: Provision
+    jobs:
+      - job: provision_azure_infrastructure
+        displayName: Provision Azure Infrastructure
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: DownloadSecureFile@1
+            name: tfvardef
+            displayName: Download terraform.tfvars
+            inputs:
+              secureFile: "terraform.tfvars"
+
+          # Needed for Terraform VM deployment
+          - task: InstallSSHKey@0
+            inputs:
+              knownHostsEntry: "known_hosts"
+              sshPublicKey: $(PUBLIC_KEY)
+              sshKeySecureFile: "terraform-azure"
+
+          - bash: |
+              cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/
+            displayName: Copy terraform.tfvars
+
+          - bash: |
+              echo Pipeline workspace dir is $(Pipeline.Workspace)
+              echo Terraform variable definition file is $(tfvardef.secureFilePath)
+              cd $(Agent.TempDirectory)
+              pwd
+              ls -la
+              cat terraform_azure.pub
+              cd ~/.ssh/
+              pwd
+              ls -la
+              cat known_hosts
+              # $(System.DefaultWorkingDirectory) is equivalent to $(Build.SourcesDirectory)
+              cd $(System.DefaultWorkingDirectory)  
+              pwd
+              ls -la
+            displayName: Verify build environment (pre)
+
+          # install Terraform Azure Pipelines Extension by Microsoft DevLabs
+          # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
+          
+
+  - stage: Build
+    jobs:
+      - job: build_artifacts_FakeRestAPI
+        displayName: Artifacts_FakeRestAPI
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: ArchiveFiles@2
+            displayName: Archive FakeRestAPI
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/jmeter/fakerestapi"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
+              verbose: true
+          - task: PublishPipelineArtifact@1
+            displayName: Publish FakeRestAPI artifact
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
+              artifactName: "drop-fakerestapi"
+  - stage: Build
+    jobs:
+      - job: build_artifacts_Selenium
+        displayName: Artifacts_Selenium
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: ArchiveFiles@2
+            displayName: Archive Selenium
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/selenium"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+              verbose: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Selenium artifact
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+              artifactName: "drop-selenium"
+  - stage: Build
+    jobs:
+      - job: build_artifacts_terraform
+        displayName: Artifacts_terraform
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: ArchiveFiles@2
+            displayName: Archive terraform
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/terraform"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
+              verbose: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish terraform artifact
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
+              artifactName: "drop-terraform"

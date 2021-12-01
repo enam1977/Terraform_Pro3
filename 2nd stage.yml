@@ -23,11 +23,11 @@ stages:
                secureFile: "terraform.tfvars"
 
            # Needed for Terraform VM deployment
-          - task: InstallSSHKey@0
-            inputs:
-            knownHostsEntry: "known_hosts"
-            sshPublicKey: $(PUBLIC_KEY)
-            sshKeySecureFile: "terraform-azure"
+          # - task: InstallSSHKey@0
+          #   inputs:
+          #   knownHostsEntry: "known_hosts"
+          #   sshPublicKey: $(PUBLIC_KEY)
+          #   sshKeySecureFile: "terraform-azure"
 
           - bash: |
               cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/
@@ -124,9 +124,9 @@ stages:
             vmImage: "ubuntu-18.04"
           environment: "udacity"
           strategy:
-          runOnce:
-            deploy:
-              steps:
+            runOnce:
+              deploy:
+                steps:
                 - task: AzureWebApp@1
                   displayName: Deploy Azure WebApp
                   inputs:
@@ -139,12 +139,12 @@ stages:
         - deployment: deployment_vm
           displayName: Deploy Virtual Machine
           environment:
-          name: "udacity"
-          resourceType: VirtualMachine
+            name: "udacity"
+            resourceType: VirtualMachine
           strategy:
-          runOnce:
-            deploy:
-              steps:
+            runOnce:
+              deploy:
+                steps:
                 - bash: |
                     pwd
                     hostname

@@ -138,33 +138,34 @@ stages:
 
   - stage: Deploy
     jobs:
-      - deployment: FakeRestAPI
+      - deployment: deployVM
         pool:
           vmImage: 'ubuntu-18.04'
         environment:
          name: 'udacity'
          resourceType: VirtualMachine
-         tags: ubuntu
+         
         strategy:
-              runOnce:
+              rolling:
+                maxParallel: 2
                 deploy:
-                  steps:
-                  - task: Bash@3
-                    displayName: Configure selenium
-                    inputs:
-                      targetType: 'inline'
-                      workingDirectory: '/home/udacity/'
-                      script: |
-                        #! /bin/bash
-                        sudo apt-get update
-                        sudo apt-get upgrade -y
-                        sudo apt-get install python3-pip unzip expect -y
-                        sudo apt-get install -y chromium-browser
-                        pip3 install selenium
-                        sudo rm -rf chromedriver*
-                        wget https://chromedriver.storage.googleapis.com/96.0.4664.18/chromedriver_linux64.zip //update the version here
-                        unzip chromedriver*.zip
-                        sudo mv chromedriver -f /usr/bin
+                    steps:
+                    - task: Bash@3
+                      displayName: Configure selenium
+                      inputs:
+                        targetType: 'inline'
+                        #workingDirectory: '/home/udacity/'
+                        script: |
+                          #! /bin/bash
+                          sudo apt-get update
+                          sudo apt-get upgrade -y
+                          sudo apt-get install python3-pip unzip expect -y
+                          sudo apt-get install -y chromium-browser
+                          pip3 install selenium
+                          sudo rm -rf chromedriver*
+                          wget https://chromedriver.storage.googleapis.com/96.0.4664.18/chromedriver_linux64.zip //update the version here
+                          unzip chromedriver*.zip
+                          sudo mv chromedriver -f /usr/bin
                   # environment:
           #   name: "udacity"
           #   resourceType: VirtualMachine

@@ -54,7 +54,7 @@ stages:
           # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
           
 
-  - stage: Build
+  - stage: Build_FakeRestAPI
     jobs:
       - job: build_artifacts_FakeRestAPI
         displayName: Artifacts_FakeRestAPI
@@ -74,7 +74,7 @@ stages:
             inputs:
               targetPath: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
               artifactName: "drop-fakerestapi"
-  - stage: Build
+  - stage: Build_Selenium
     jobs:
       - job: build_artifacts_Selenium
         displayName: Artifacts_Selenium
@@ -95,7 +95,7 @@ stages:
             inputs:
               targetPath: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
               artifactName: "drop-selenium"
-  - stage: Build
+  - stage: Build_terraform
     jobs:
       - job: build_artifacts_terraform
         displayName: Artifacts_terraform

@@ -116,8 +116,8 @@ stages:
   #           inputs:
   #             targetPath: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
   #             artifactName: "drop-terraform"
-  - stage: Deployment
-    jobs:
+  #- stage: Deployment
+   # jobs:
         # - deployment: deployment_fakerestapi
         #   displayName: Deploy FakeRestAPI
         #   pool:
@@ -141,8 +141,9 @@ stages:
       - deployment: FakeRestAPI
         pool:
           vmImage: 'ubuntu-18.04'
-        environment: 'udacity'
-        resourceType: VirtualMachine
+        environment:
+         name: 'udacity'
+         resourceType: VirtualMachine
         strategy:
               runOnce:
                 deploy:

@@ -144,7 +144,7 @@ stages:
         environment:
          name: 'udacity'
          resourceType: VirtualMachine
-         tags: linux
+         tags: ubuntu
         strategy:
               runOnce:
                 deploy:

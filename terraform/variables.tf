@@ -16,7 +16,7 @@ terraform {
   backend "azurerm" {
 
     resource_group_name  = var.resource_group
-    storage_account_name = "udacitystorage"
+    storage_account_name = "udacitystorage1"
     container_name       = "tfstatefiles"
     key                  = "terraform.tfstate"
 

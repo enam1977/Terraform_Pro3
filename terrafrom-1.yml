@@ -54,9 +54,7 @@ stages:
             inputs:
               command: validate
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
-          - script: 'terraform force-unlock -force 9db590f1-b6fe-c5f2-2678-8804f089deba'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-            displayName: 'Command Line Script'
+          
           - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
             displayName: "Terraform : plan"
             inputs:

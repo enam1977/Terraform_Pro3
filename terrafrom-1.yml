@@ -56,11 +56,11 @@ stages:
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
           
           - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-            displayName: "Terraform : plan"
+            displayName: 'Terraform : plan'
             inputs:
               command: plan
-              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
-              commandOptions: "-var-file=dev.tfvars"
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+              commandOptions: '-var-file=dev.tfvars'
               environmentServiceNameAzureRM: enamul01
 
           - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2

@@ -60,7 +60,7 @@ stages:
             inputs:
               command: plan
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-              commandOptions: 
+              commandOptions: terraform plan -lock=false ...
               environmentServiceNameAzureRM: enamul01
                #'-var-file=dev.tfvars'
           - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2

@@ -67,9 +67,9 @@ stages:
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
       displayName: 'Terraform : init'
       inputs:
-        backendServiceArm: enamul01
+        backendServiceArm: terraformiacdevops1
         backendAzureRmResourceGroupName: 'terraform-storage-rg'
-        backendAzureRmStorageAccountName: udacitystorage
+        backendAzureRmStorageAccountName: udacitystorage1
         backendAzureRmContainerName: tfstatefiles
         backendAzureRmKey: 'dev-terraform.tfstate'
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
@@ -86,11 +86,11 @@ stages:
         command: plan
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
         commandOptions: '-var-file=dev.tfvars'
-        environmentServiceNameAzureRM: enamul01
+        environmentServiceNameAzureRM: terraformiacdevops1
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
       displayName: 'Terraform : apply -auto-approve'
       inputs:
         command: apply
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
         commandOptions: '-var-file=dev.tfvars -auto-approve'
-        environmentServiceNameAzureRM: enamul01
+        environmentServiceNameAzureRM: terraformiacdevops1

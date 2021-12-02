@@ -1,96 +1,72 @@
+variables:
+  system.debug: true
+
 trigger:
-  branches:
-    include:
-    - main
-  paths:
-    exclude:
-    - README.md
-    - .gitignore
-    - screenshots/
+  - main
+
+pool:
+  vmImage: "ubuntu-latest"
 
 stages:
-- stage: Provision
-  jobs:
-  - job: provision_azure_infrastructure
-    displayName: Provision Azure Infrastructure
-    pool:
-      vmImage: 'ubuntu-18.04'
-    steps:
-    - task: DownloadSecureFile@1
-      name: tfvardef
-      displayName: Download terraform.tfvars
-      inputs:
-        secureFile: 'terraform.tfvars' 
+  - stage: Build
+    displayName: Build Stage
+    jobs:
+      - job: Build
+        displayName: Build Stage
+        steps:
+          - checkout: self
+            persistCredentials: true
+            clean: true
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Terraform Code"
+            inputs:
+              path: $(system.DefaultWorkingDirectory)/terraform
+              artifact: TerraformBuild
+  - stage: DownloadArtifact
+    displayName: "Download Terraform Artif"
+    jobs:
+      - job: Build
+        displayName: DownloadCode
+        steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifactName: TerraformBuild
+              buildVersionToDownload: latest
+              downloadPath: $(system.DefaultWorkingDirectory)/terraform
 
-    # Needed for Terraform VM deployment
-    - task: InstallSSHKey@0
-      inputs:
-        knownHostsEntry: 'known_hosts'
-        sshPublicKey: $(PUBLIC_KEY)
-        sshKeySecureFile: 'terraform-azure'
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+            displayName: "Install Terraform 1.0.5"
+            inputs:
+              terraformVersion: 1.0.5
 
-    - bash: |
-        cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/
-      displayName: Copy terraform.tfvars
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+            displayName: "Terraform : init"
+            inputs:
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+              backendServiceArm: enamul01
+              backendAzureRmResourceGroupName: "terraform-storage-rg"
+              backendAzureRmStorageAccountName: udacitystorage1
+              backendAzureRmContainerName: tfstatefiles
+              backendAzureRmKey: "dev-terraform.tfstate"
 
-    - bash: |
-        echo Pipeline workspace dir is $(Pipeline.Workspace)
-        echo Terraform variable definition file is $(tfvardef.secureFilePath)
-        cd $(Agent.TempDirectory)
-        pwd
-        ls -la
-        cat terraform-azure.pub
-        cd ~/.ssh/
-        pwd
-        ls -la
-        cat known_hosts
-        # $(System.DefaultWorkingDirectory) is equivalent to $(Build.SourcesDirectory)
-        cd $(System.DefaultWorkingDirectory)  
-        pwd
-        ls -la
-      displayName: Verify build environment (pre)
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+            displayName: "Terraform : validate"
+            inputs:
+              command: validate
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
 
-    # install Terraform Azure Pipelines Extension by Microsoft DevLabs
-    # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
-- stage: Deploy_terraform
-  jobs:
-  - job: Deploy_terraform
-    displayName: Deploy_terraform
-    pool:
-      vmImage: 'ubuntu-18.04'
-    steps:
-    - task: TerraformInstaller@0
-      displayName: 'Install Terraform 1.0.10'
-      inputs:
-        terraformVersion: "1.0.10"
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+            displayName: "Terraform : plan"
+            inputs:
+              command: plan
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+              commandOptions: "-var-file=dev.tfvars"
+              environmentServiceNameAzureRM: enamul01
 
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-      displayName: 'Terraform : init'
-      inputs:
-        backendServiceArm: terraformiacdevops1
-        backendAzureRmResourceGroupName: 'terraform-storage-rg'
-        backendAzureRmStorageAccountName: udacitystorage1
-        backendAzureRmContainerName: tfstatefiles
-        backendAzureRmKey: 'dev-terraform.tfstate'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
-
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-      displayName: 'Terraform : validate'
-      inputs:
-        command: validate
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-    
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-      displayName: 'Terraform : plan'
-      inputs:
-        command: plan
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-        commandOptions: '-var-file=dev.tfvars'
-        environmentServiceNameAzureRM: terraformiacdevops1
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-      displayName: 'Terraform : apply -auto-approve'
-      inputs:
-        command: apply
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-        commandOptions: '-var-file=dev.tfvars -auto-approve'
-        environmentServiceNameAzureRM: terraformiacdevops1
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+            displayName: "Terraform : apply -auto-approve"
+            inputs:
+              command: apply
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+              commandOptions: "-var-file=dev.tfvars -auto-approve"
+              environmentServiceNameAzureRM: enamul01

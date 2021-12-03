@@ -26,10 +26,7 @@ terraform {
 
 # Provider Block of azure
 provider "azurerm" {
-  # tenant_id       = var.tenant_id
-  # subscription_id = var.subscription_id
-  # client_id       = var.client_id
-  # client_secret   = var.client_secret
+ 
   features {}
 }
 
@@ -134,8 +131,3 @@ variable "web_linuxvm_admin_user" {
 variable "application_type" {}
 variable "resource_type" {}
 
-
-variable "subscription_id" {}
-variable "client_id" {}
-variable "client_secret" {}
-variable "tenant_id" {}

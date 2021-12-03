@@ -29,27 +29,7 @@ stages:
               sshPublicKey: $(PUBLIC_KEY)
               sshKeySecureFile: "terraform-azure"
 
-          - bash: |
-              cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/
-            displayName: Copy terraform.tfvars
-          - bash: |
-              echo Pipeline workspace dir is $(Pipeline.Workspace)
-              echo Terraform variable definition file is $(tfvardef.secureFilePath)
-              cd $(Agent.TempDirectory)
-              pwd
-              ls -la
-              cat terraform_azure.pub
-              cd ~/.ssh/
-              pwd
-              ls -la
-              cat known_hosts
-              # $(System.DefaultWorkingDirectory) is equivalent to $(Build.SourcesDirectory)
-              cd $(System.DefaultWorkingDirectory)  
-              pwd
-              ls -la
-            displayName: Verify build environment (pre)
-          # install Terraform Azure Pipelines Extension by Microsoft DevLabs
-          # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
+          
           
 
   - stage: Build
@@ -64,8 +44,9 @@ stages:
           - task: PublishPipelineArtifact@1
             displayName: "Publish Terraform Code"
             inputs:
-              path: $(system.DefaultWorkingDirectory)
+              path: $(system.DefaultWorkingDirectory)/terraform
               artifact: TerraformBuild
+              
   - stage: DownloadArtifact
     displayName: "Download Terraform Artif"
     jobs:

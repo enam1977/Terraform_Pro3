@@ -116,25 +116,25 @@ stages:
             inputs:
               targetPath: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
               artifactName: "drop-terraform"
-  # - stage: Deployment
-  #   jobs:
-  #       - deployment: deployment_fakerestapi
-  #         displayName: Deploy FakeRestAPI
-  #         pool:
-  #           vmImage: "ubuntu-18.04"
-  #         environment: "udacity"
-  #         strategy:
-  #           runOnce:
-  #             deploy:
-  #               steps:
-  #               - task: AzureWebApp@1
-  #                 displayName: Deploy Azure WebApp
-  #                 inputs:
-  #                   azureSubscription: "enamul01"
-  #                   appName: "webapp-webappservice"
-  #                   appType: webApp
-  #                   package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
- #                   deploymentMethod: zipDeploy
+  - stage: Deployment
+    jobs:
+        - deployment: deployment_fakerestapi
+          displayName: Deploy FakeRestAPI
+          pool:
+            vmImage: "ubuntu-18.04"
+          environment: "udacity"
+          strategy:
+            runOnce:
+              deploy:
+                steps:
+                - task: AzureWebApp@1
+                  displayName: Deploy Azure WebApp
+                  inputs:
+                    azureSubscription: "enamul01"
+                    appName: "webapp-webappservice"
+                    appType: webApp
+                    package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
+                  deploymentMethod: zipDeploy
 
   - stage: Deploy
     jobs:
@@ -168,14 +168,14 @@ stages:
                     /usr/bin/chromium-browser --version
                     /usr/bin/chromedriver --version
                     python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
-                    Install Log Analytics agent on Linux computers (only need to run once)
-                    wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
-                    sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
-                    sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
-                    #env: # To use secret variables in a script, we must explicitly map them as environment variables.
+                    #Install Log Analytics agent on Linux computers (only need to run once)
+                    #wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
+                    #sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
+                    #sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
+                  env: # To use secret variables in a script, we must explicitly map them as environment variables.
                     AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
                     AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
-                    displayName: Configure selenium
+                  displayName: Configure selenium
   - stage: Test
     jobs:
       - deployment: test_vm

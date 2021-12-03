@@ -26,7 +26,7 @@ stages:
     displayName: "Download Terraform Artif"
     jobs:
       - job: Build
-        displayName: DownloadCode
+        displayName: DownloadTerraformCode
         steps:
           - task: DownloadPipelineArtifact@2
             inputs:

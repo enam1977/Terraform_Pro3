@@ -134,7 +134,7 @@ stages:
                     appName: "webapp-webappservice"
                     appType: webApp
                     package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
-                  deploymentMethod: zipDeploy
+                    deploymentMethod: zipDeploy
 
   - stage: Deploy
     jobs:

@@ -45,7 +45,7 @@ stages:
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
               backendServiceArm: enamul01
               backendAzureRmResourceGroupName: "terraform-storage-rg"
-              backendAzureRmStorageAccountName: udacitystorage
+              backendAzureRmStorageAccountName: udacitystorage1
               backendAzureRmContainerName: tfstatefiles
               backendAzureRmKey: "dev-terraform.tfstate"
 

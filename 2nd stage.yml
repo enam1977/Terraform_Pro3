@@ -176,3 +176,4 @@ stages:
                     AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
                     AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
                     displayName: Configure selenium
+  

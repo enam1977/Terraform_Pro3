@@ -1,19 +1,50 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - README.md
+      - .gitignore
+      - screenshots/
 
-pool:
-  vmImage: ubuntu-latest
+stages:
+  - stage: Provision
+    jobs:
+      - job: provision_azure_infrastructure
+        displayName: Provision Azure Infrastructure
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: DownloadSecureFile@1
+            name: tfvardef
+            displayName: Download terraform.tfvars
+            inputs:
+              secureFile: "terraform.tfvars"
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+          # Needed for Terraform VM deployment
+          - task: InstallSSHKey@0
+            inputs:
+              knownHostsEntry: "known_hosts"
+              sshPublicKey: $(PUBLIC_KEY)
+              sshKeySecureFile: "terraform-azure"
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+          - bash: |
+              cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/
+            displayName: Copy terraform.tfvars
+          - bash: |
+              echo Pipeline workspace dir is $(Pipeline.Workspace)
+              echo Terraform variable definition file is $(tfvardef.secureFilePath)
+              cd $(Agent.TempDirectory)
+              pwd
+              ls -la
+              cat terraform_azure.pub
+              cd ~/.ssh/
+              pwd
+              ls -la
+              cat known_hosts
+              # $(System.DefaultWorkingDirectory) is equivalent to $(Build.SourcesDirectory)
+              cd $(System.DefaultWorkingDirectory)  
+              pwd
+              ls -la
+            displayName: Verify build environment (pre)

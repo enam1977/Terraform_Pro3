@@ -195,18 +195,18 @@ stages:
                     ls -la
                     sudo mkdir -p /var/log/selenium
                     sudo chmod 664 /var/log/selenium
-                    sudo python3 -u login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log
+                    sudo python3 -u login.py 2>&1 | sudo tee -a /var/log/selenium/login.log
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
                     mkdir -p log/selenium
                     pwd
-                    sudo cp /var/log/selenium/selenium-test.log log/selenium/selenium-test.log
+                    sudo cp /var/log/selenium/login.log log/selenium/login.log
                     ls -la
                   displayName: Run selenium tests
                 - task: PublishPipelineArtifact@1
                   displayName: Publish selenium logs
                   inputs:
-                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log"
+                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/login.log"
                     artifactName: "drop-selenium-logs"
 
       - job: test_jmeter

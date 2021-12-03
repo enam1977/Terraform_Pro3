@@ -55,14 +55,14 @@ stages:
               command: validate
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
 
-          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
-            displayName: "Terraform : plan"
-            inputs:
-              command: plan
-              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
-              commandOptions: 
-              environmentServiceNameAzureRM: enamul01
-              #"-var-file=dev.tfvars"
+          # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+          #   displayName: "Terraform : plan"
+          #   inputs:
+          #     command: plan
+          #     workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+          #     commandOptions: 
+          #     environmentServiceNameAzureRM: enamul01
+          #     #"-var-file=dev.tfvars"
 
           - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
             displayName: "Terraform : apply -auto-approve"

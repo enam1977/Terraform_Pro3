@@ -60,13 +60,15 @@ stages:
             inputs:
               command: plan
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
-              commandOptions: "-var-file=dev.tfvars"
+              commandOptions: 
               environmentServiceNameAzureRM: enamul01
+              #"-var-file=dev.tfvars"
 
           - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
             displayName: "Terraform : apply -auto-approve"
             inputs:
               command: apply
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
-              commandOptions: "-var-file=dev.tfvars -auto-approve"
+              commandOptions: "-auto-approve"
               environmentServiceNameAzureRM: enamul01
+              #-var-file=dev.tfvars 

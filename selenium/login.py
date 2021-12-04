@@ -1,53 +1,83 @@
 # #!/usr/bin/env python
 from selenium import webdriver
-from selenium.webdriver.chrome import options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.expected_conditions import presence_of_element_located
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+import logging
 
-option = webdriver.ChromeOptions
-options.add_argument("--headless") 
-options.add_argument('--no-sandbox')
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+# driver = webdriver.Chrome()
+# print ('Browser started successfully. Navigating to the demo page to login.')
+# driver.get('https://www.saucedemo.com/')
+
 
 # Start the browser and login with standard_user
-url = 'https://www.saucedemo.com/'
-driver = webdriver.Chrome('/usr/bin/chromedriver',options=options)
-driver.get(url)
-wait = WebDriverWait(driver, 10)
-print("my website name is" + url)
-print('Browser started successfully. Navigating to the demo page to login.', options=options)
-# def login(user, password):
-#  print('Starting the browser...')
-# --uncomment when running in Azure DevOps.
-# options = ChromeOptions()
-# options.add_argument("--headless")
-# driver = webdriver.Chrome(options=options)
+def login(user, password):
+    logging.info('Starting the browser...')
+    # --uncomment when running in Azure DevOps.
+    options = ChromeOptions()
+    # solve DevToolsActivePort
+    options.add_argument("--headless")
+    options.add_argument('--no-sandbox')
+    # options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome('/usr/bin/chromedriver', options=options)
+    # print ('Browser started successfully. Navigating to the demo page to login.')
+    driver.get('https://www.saucedemo.com/')
+    # input user, password
+    driver.find_element_by_css_selector("input[id=user-name]").send_keys(user)
+    driver.find_element_by_css_selector(
+        "input[id=password]").send_keys(password)
+    driver.find_element_by_css_selector("input[id=login-button]").click()
+    product_label = driver.find_element_by_css_selector(
+        "span[class=title").text
+    assert "PRODUCTS" in product_label
+    logging.info('Login with username: {:s} and password: {:s} successfully.'.format(
+        user, password))
+    return driver
 
-# wait = WebDriverWait(driver, 10)
+# add all items to cart
 
-username = "standard_user"
-password = "secret_sauce"
-driver.find_element(By.CSS_SELECTOR, '[id="user-name"]').send_keys(username)
-driver.find_element(By.CSS_SELECTOR, '[id="password"]').send_keys(password)
-driver.find_element(By.CSS_SELECTOR, '[id="login-button"]').click()
 
-print('login succesfull')
+def add_items(driver, nums):
+    for i in range(nums):
+        prod = "a[id='item_"+str(i)+"_title_link']"
+        # print(prod)
+        driver.find_element_by_css_selector(prod).click()
+        driver.find_element_by_css_selector(
+            'button.btn_primary.btn_inventory').click()
+        product = driver.find_element_by_css_selector(
+            "div[class='inventory_details_name large_size']").text
+        logging.info("Add " + product + " to cart successfully!")
+        # back to main menu
+        driver.find_element_by_css_selector(
+            'button[id=back-to-products]').click()
+    logging.info(str(nums)+" products has been added to the cart.")
 
-items_added = driver.find_elements_by_class_name('btn_inventory')
 
-for item in items_added:
-    item.click()
-print({len(items_added)}, 'items have been added')
+def remove_items(driver, nums):
+    for i in range(nums):
+        prod = "a[id='item_"+str(i)+"_title_link']"
+        # print(prod)
+        driver.find_element_by_css_selector(prod).click()
+        driver.find_element_by_css_selector(
+            'button.btn_secondary.btn_inventory').click()
+        product = driver.find_element_by_css_selector(
+            "div[class='inventory_details_name large_size']").text
+        logging.info("Remove " + product + " from the cart successfully!")
+        # back to main menu
+        driver.find_element_by_css_selector(
+            'button[id=back-to-products]').click()
+    logging.info(str(nums)+" products has been removed from the cart.")
 
-driver.find_element_by_class_name('shopping_cart_link').click()
-WebDriverWait(driver, 10)
-cart_remove_items = driver.find_elements_by_class_name('cart_button')
 
-for remove_item in cart_remove_items:
-    remove_item.click()
-
-print({len(cart_remove_items)}, 'items items have been removed')
-
-Wait = WebDriverWait(driver, 10)
+if __name__ == "__main__":
+    USERNAME = 'standard_user'
+    PASSWORD = 'secret_sauce'
+    driver = login(USERNAME, PASSWORD)
+    # driver.find_element_by_css_selector("a[id='item_1_title_link']").click()
+    nums = 6
+    add_items(driver, nums)
+    remove_items(driver, nums)
+    logging.info('Selenium tests are all successfully completed!')

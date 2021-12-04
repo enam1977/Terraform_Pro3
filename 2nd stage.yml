@@ -210,7 +210,7 @@ stages:
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
                     mkdir -p log/selenium
-                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium-test.log.txt
+                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium_log_udacity.log.txt
                     cd log/selenium
                     pwd
                     ls -la
@@ -218,7 +218,7 @@ stages:
                 - task: PublishPipelineArtifact@1
                   displayName: Publish selenium logs
                   inputs:
-                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log.txt"
+                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium_log_udacity.log.txt"
                     artifactName: "drop-selenium-logs"
 
       - job: test_jmeter

@@ -142,13 +142,12 @@ stages:
         pool:
           vmImage: 'ubuntu-18.04'
         environment:
-          name: 'udacity'
+          name: "udacity"
           resourceType: VirtualMachine
         strategy:
           runOnce:
             deploy:
-                steps:
-                - checkout: self
+              steps:
                 - bash: |
                     pwd
                     python3 -V
@@ -158,31 +157,11 @@ stages:
                     /usr/bin/chromedriver --version
                     # pip3 install selenium
                     python3 -c "print('Selenium Version:', selenium.__version__)"
-                    sudo apt-get upgrade -y
-                    sudo apt-get install python3-pip -y
-                    sudo apt-get install unzip -y
-                    sudo apt-get install -y chromium-browser
-                    pip3 install selenium
-                    pip install pytest
-                    pip install pytest-html
-                    pip install chromedriver-py==88.0.4324.96
-                    pip install pytest-xdist
-                    pip install pytest-nunit
-                    sudo apt install google-chrome-stable
-                    pip install webdriver_manager
-                    
-                    #Install Log Analytics agent on Linux computers (only need to run once)
-                    #wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
-                    #sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
-                    #sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
-                  env: # To use secret variables in a script, we must explicitly map them as environment variables.
-                    AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
-                    AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
-                  displayName: Configure selenium
-  - stage: Test
+                  displayName: Configure selenium and VM
+  - stage: Tests
     jobs:
       - deployment: test_vm
-        displayName: Test on Virtual Machine
+        displayName: Tests on VM
         environment:
           name: "udacity"
           resourceType: VirtualMachine
@@ -212,7 +191,7 @@ stages:
                     cd log/selenium
                     pwd
                     ls -la
-                  displayName: Run selenium tests
+                  displayName: Selenium tests
                 - task: PublishPipelineArtifact@1
                   displayName: Publish selenium logs
                   inputs:
@@ -294,17 +273,17 @@ stages:
               ls -la
             displayName: Install Newman
           - bash: |
-              newman run /postman/regression-test.json \
-                         -e /postman/validation-test-env.postman-environment.json \
+              newman run /postman/RegressionTest.json \
+                         -e /postman/Proj3.postman_environment.json \
                          --reporters cli,junit \
                          --reporter-junit-export log/newman/regression-test.xml \
                          --suppress-exit-code
             displayName: Newman regression test
           - bash: |
-              newman run postman/validation-test.json \
-                         -e /postman/validation-test-env.postman-environment.json \
+              newman run postman/DataValidationTest.json \
+                         -e /postman/Proj3.postman_environment.json \
                          --reporters cli,junit \
-                         --reporter-junit-export log/newman/validation-test.xml \
+                         --reporter-junit-export log/newman/data-validation-test.xml \
                          --suppress-exit-code
               ls -la $(System.DefaultWorkingDirectory)/log/newman/
             displayName: Newman validation test

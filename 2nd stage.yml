@@ -158,30 +158,17 @@ stages:
                     /usr/bin/chromedriver --version
                     # pip3 install selenium
                     python3 -c "print('Selenium Version:', selenium.__version__)"
-                    python -m pip install --upgrade pip
-
                     sudo apt-get upgrade -y
-
                     sudo apt-get install python3-pip -y
-
                     sudo apt-get install unzip -y
-
                     sudo apt-get install -y chromium-browser
-
                     pip3 install selenium
-
                     pip install pytest
-
                     pip install pytest-html
-
                     pip install chromedriver-py==88.0.4324.96
-
                     pip install pytest-xdist
-
                     pip install pytest-nunit
-
                     sudo apt install google-chrome-stable
-
                     pip install webdriver_manager
                     
                     #Install Log Analytics agent on Linux computers (only need to run once)

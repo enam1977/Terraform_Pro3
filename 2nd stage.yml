@@ -295,9 +295,9 @@ stages:
           vmImage: "ubuntu-18.04"
         steps:
           - task: NodeTool@0
-            displayName: Install Node v12.X
+            displayName: Install Node v14.X
             inputs:
-              versionSpec: "12.x"
+              versionSpec: "14.x"
           - bash: |
               npm install -g newman
               newman --version
@@ -308,13 +308,14 @@ stages:
             displayName: Install Newman
           - bash: |
               newman run /postman/regression-test.json \
+                         -e /postman/validation-test-env.postman-environment.json \
                          --reporters cli,junit \
                          --reporter-junit-export log/newman/regression-test.xml \
                          --suppress-exit-code
             displayName: Newman regression test
           - bash: |
               newman run postman/validation-test.json \
-                         -e automatedtesting/postman/validation-test-env.postman-environment.json \
+                         -e /postman/validation-test-env.postman-environment.json \
                          --reporters cli,junit \
                          --reporter-junit-export log/newman/validation-test.xml \
                          --suppress-exit-code

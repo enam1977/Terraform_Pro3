@@ -1,0 +1,257 @@
+{
+	"info": {
+		"_postman_id": "389f2021-98dc-4816-aa6e-ceb04abf10b1",
+		"name": "Starter APIs-Data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Employees",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"try{",
+							"    pm.response.to.have.status(200);",
+							"    pm.test(\"Status code is 200\",() => true)",
+							"}catch(e){",
+							"    pm.test(\"Status code is not 200\", ()=>{throw new Error(e.message)})",
+							"}",
+							"",
+							"try{",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"    pm.test(\"Successful response\", () => true)",
+							"}catch(e){",
+							"    pm.test(\"Failed response \",()=>{throw new Error(e.message)})",
+							"}",
+							"",
+							"",
+							"try{",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.id).to.eql(1);",
+							"    pm.expect(jsonData.data.employee_name).to.eql(\"Tiger Nixon\");",
+							"    pm.expect(jsonData.data.employee_salary).to.eql(320800);",
+							"    pm.expect(jsonData.data.employee_age).to.eql(61);",
+							"    pm.expect(jsonData.data.profile_image).to.eql(\"\")",
+							"    pm.test(\"Check Json Data successfully.\",() => true)",
+							"}catch(e){",
+							"    pm.test(\"Failed Check.\",()=>{throw new Error(e.message)})",
+							"}",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/api/v1/employee/1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"employee",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Employee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// pm.test(\"Successful response\", function () {",
+							"//     pm.expect(pm.response.text()).to.include(\"success\");",
+							"// });",
+							"",
+							"// var json = pm.response.json();",
+							"// pm.environment.set(\"id\", json.data.id);",
+							"",
+							"// pm.test(\"Status code is 200\", function () {",
+							"//     pm.response.to.have.status(200);",
+							"// });",
+							"",
+							"// pm.test(\"Response in not Null\", function () {",
+							"//     pm.expect(json.data.id).not.null;",
+							"// });",
+							"",
+							"try{",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"    pm.test(\"Successful response\", () => true)",
+							"    ",
+							"}catch(e){",
+							"    pm.test(\"Failed response \",()=>{throw new Error(e.message)})",
+							"}",
+							"",
+							"try{",
+							"    pm.response.to.have.status(200);",
+							"    pm.test(\"Status code is 200\",() => true)",
+							"}catch(e){",
+							"    pm.test(\"Status code is not 200\", ()=>{throw new Error(e.message)})",
+							"}",
+							"",
+							"try{",
+							"    var json = pm.response.json();",
+							"    pm.environment.set(\"id\", json.data.id);",
+							"    pm.expect(json.data.id).not.null;",
+							"    pm.test(\"Response is not null.\",()=>true)",
+							"}catch(e){",
+							"    pm.test(\"Response is null\",()=>{throw new Error(e.message)})",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":{{name}},\n    \"salary\":{{salary}},\n    \"age\":{{age}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/v1/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Employees",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"try{",
+							"    pm.response.to.have.status(200);",
+							"    pm.test(\"Status code is 200\",() => true)",
+							"}catch(e){",
+							"    pm.test(\"Status code is not 200\", ()=>{throw new Error(e.message)})",
+							"}",
+							"",
+							"try{",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"    pm.test(\"Successful response\", () => true)",
+							"}catch(e){",
+							"    pm.test(\"Failed response \",()=>{throw new Error(e.message)})",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": {{new_name}},\n    \"salary\": {{new_salary}},\n    \"age\" : {{new_age}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/v1/update/{{id}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"update",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Employees",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"try{",
+							"    pm.response.to.have.status(200);",
+							"    pm.test(\"Status code is 200\",() => true)",
+							"}catch(e){",
+							"    pm.test(\"Status code is not 200\", ()=>{throw new Error(e.message)})",
+							"}",
+							"",
+							"try{",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"    pm.test(\"Successful response\", () => true)",
+							"}catch(e){",
+							"    pm.test(\"Failed response \",()=>{throw new Error(e.message)})",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://dummy.restapiexample.com/api/v1/delete/{{id}}",
+					"protocol": "http",
+					"host": [
+						"dummy",
+						"restapiexample",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"delete",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

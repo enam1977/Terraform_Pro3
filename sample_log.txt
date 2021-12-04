@@ -1,0 +1,1 @@
+2021-09-01 20:48:25 INFO     Login with username: standard_user and password: secret_sauce successfully.

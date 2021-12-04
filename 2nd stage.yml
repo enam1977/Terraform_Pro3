@@ -177,9 +177,11 @@ stages:
                     # wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
                     # sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
                     # sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
+                    export PATH=$PATH:'$(System.DefaultWorkingDirectory)/selenium'
                   env: # To use secret variables in a script, we must explicitly map them as environment variables.
                     AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
                     AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
+              
                   displayName: Configure selenium
   - stage: Tests
     jobs:
@@ -201,16 +203,16 @@ stages:
                     # add sudo here
                     sudo mkdir -p /var/log/selenium
                     sudo chmod 775 /var/log/selenium
-                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium_log_udacity.log.txt
-                    sudo chmod 775 /var/log/selenium/selenium_log_udacity.log.txt
-                    echo "Display /var/log/selenium/selenium_log_udacity.log.txt"
-                    sudo cat /var/log/selenium/selenium_log_udacity.log.txt
+                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log
+                    sudo chmod 775 /var/log/selenium/selenium-test.log
+                    echo "Display /var/log/selenium/selenium-test.log
+                    sudo cat /var/log/selenium/selenium-test.log
                     echo "-------------------------------------------------"
                     ls -la
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
                     mkdir -p log/selenium
-                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium_log_udacity.log.txt
+                    sudo cp /var/log/selenium/selenium-test.log.txt /var/log/selenium/selenium-test.log
                     cd log/selenium
                     pwd
                     ls -la
@@ -218,7 +220,7 @@ stages:
                 - task: PublishPipelineArtifact@1
                   displayName: Publish selenium logs
                   inputs:
-                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium_log_udacity.log.txt"
+                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log"
                     artifactName: "drop-selenium-logs"
 
       - job: test_jmeter

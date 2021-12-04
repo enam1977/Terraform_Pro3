@@ -71,7 +71,7 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
     version   = "latest"
   }
 
- 
+}
 
 # Resource-1: Create WebTier Subnet
 resource "azurerm_subnet" "websubnet" {

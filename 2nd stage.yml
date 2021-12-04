@@ -54,68 +54,68 @@ stages:
           # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
           
 
-  - stage: Build_FakeRestAPI
-    jobs:
-      - job: build_artifacts_FakeRestAPI
-        displayName: Artifacts_FakeRestAPI
-        pool:
-          vmImage: "ubuntu-18.04"
-        steps:
-          - task: ArchiveFiles@2
-            displayName: Archive FakeRestAPI
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/jmeter/fakerestapi"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
-              verbose: true
-          - task: PublishPipelineArtifact@1
-            displayName: Publish FakeRestAPI artifact
-            inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
-              artifactName: "drop-fakerestapi"
-  - stage: Build_Selenium
-    jobs:
-      - job: build_artifacts_Selenium
-        displayName: Artifacts_Selenium
-        pool:
-          vmImage: "ubuntu-18.04"
-        steps:
-          - task: ArchiveFiles@2
-            displayName: Archive Selenium
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/selenium"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
-              verbose: true
+  # - stage: Build_FakeRestAPI
+  #   jobs:
+  #     - job: build_artifacts_FakeRestAPI
+  #       displayName: Artifacts_FakeRestAPI
+  #       pool:
+  #         vmImage: "ubuntu-18.04"
+  #       steps:
+  #         - task: ArchiveFiles@2
+  #           displayName: Archive FakeRestAPI
+  #           inputs:
+  #             rootFolderOrFile: "$(System.DefaultWorkingDirectory)/jmeter/fakerestapi"
+  #             includeRootFolder: false
+  #             archiveType: "zip"
+  #             archiveFile: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
+  #             verbose: true
+  #         - task: PublishPipelineArtifact@1
+  #           displayName: Publish FakeRestAPI artifact
+  #           inputs:
+  #             targetPath: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
+  #             artifactName: "drop-fakerestapi"
+  # - stage: Build_Selenium
+  #   jobs:
+  #     - job: build_artifacts_Selenium
+  #       displayName: Artifacts_Selenium
+  #       pool:
+  #         vmImage: "ubuntu-18.04"
+  #       steps:
+  #         - task: ArchiveFiles@2
+  #           displayName: Archive Selenium
+  #           inputs:
+  #             rootFolderOrFile: "$(System.DefaultWorkingDirectory)/selenium"
+  #             includeRootFolder: false
+  #             archiveType: "zip"
+  #             archiveFile: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+  #             verbose: true
 
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Selenium artifact
-            inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
-              artifactName: "drop-selenium"
-  - stage: Build_terraform
-    jobs:
-      - job: build_artifacts_terraform
-        displayName: Artifacts_terraform
-        pool:
-          vmImage: "ubuntu-18.04"
-        steps:
-          - task: ArchiveFiles@2
-            displayName: Archive terraform
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/terraform"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
-              verbose: true
+  #         - task: PublishPipelineArtifact@1
+  #           displayName: Publish Selenium artifact
+  #           inputs:
+  #             targetPath: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+  #             artifactName: "drop-selenium"
+  # - stage: Build_terraform
+  #   jobs:
+  #     - job: build_artifacts_terraform
+  #       displayName: Artifacts_terraform
+  #       pool:
+  #         vmImage: "ubuntu-18.04"
+  #       steps:
+  #         - task: ArchiveFiles@2
+  #           displayName: Archive terraform
+  #           inputs:
+  #             rootFolderOrFile: "$(System.DefaultWorkingDirectory)/terraform"
+  #             includeRootFolder: false
+  #             archiveType: "zip"
+  #             archiveFile: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
+  #             verbose: true
 
-          - task: PublishPipelineArtifact@1
-            displayName: Publish terraform artifact
-            inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
-              artifactName: "drop-terraform"
+  #         - task: PublishPipelineArtifact@1
+  #           displayName: Publish terraform artifact
+  #           inputs:
+  #             targetPath: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
+  #             artifactName: "drop-terraform"
   - stage: Deployment
     jobs:
         - deployment: deployment_fakerestapi
@@ -156,8 +156,31 @@ stages:
                     /usr/bin/chromium-browser --version
                     /usr/bin/chromedriver --version
                     # pip3 install selenium
-                    python3 -c "print('Selenium Version:', selenium.__version__)"
-                  displayName: Configure selenium and VM
+                    sudo apt-get upgrade -y
+                    sudo apt-get install python3-pip -y
+                    sudo apt-get install unzip -y
+                    sudo apt-get install -y chromium-browser
+                    pip3 install selenium
+                    pip install pytest
+                    pip install pytest-html
+                    pip install chromedriver-py==88.0.4324.96
+                    pip install pytest-xdist
+                    pip install pytest-nunit
+                    sudo apt install google-chrome-stable
+                    pip install webdriver_manager
+                    wget https://files.pythonhosted.org/packages/ed/9c/9030520bf6ff0b4c98988448a93c04fcbd5b13cd9520074d8ed53569ccfe/selenium-3.141.0.tar.gz
+                    tar -zxvf selenium-3.141.0.tar.gz 
+                    cd selenium-3.141.0/
+                    python3 setup.py install                            
+                    python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
+                    #Install Log Analytics agent on Linux computers (only need to run once)
+                    wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
+                    sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
+                    sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
+                  env: # To use secret variables in a script, we must explicitly map them as environment variables.
+                    AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
+                    AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
+                  displayName: Configure selenium
   - stage: Tests
     jobs:
       - deployment: test_vm

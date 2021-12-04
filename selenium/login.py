@@ -8,11 +8,12 @@ from selenium.webdriver.support.expected_conditions import presence_of_element_l
 from selenium.webdriver.chrome.options import Options
 
 option = webdriver.ChromeOptions
-options.headless = True
+options.add_argument("--headless") 
+options.add_argument('--no-sandbox')
 
 # Start the browser and login with standard_user
 url = 'https://www.saucedemo.com/'
-driver = webdriver.Chrome()
+driver = webdriver.Chrome('/usr/bin/chromedriver',options=options)
 driver.get(url)
 wait = WebDriverWait(driver, 10)
 print("my website name is" + url)

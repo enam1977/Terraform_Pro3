@@ -1,4 +1,251 @@
+
+Title: Ensuring Quality Releases
+
+Prerequisites:
+
+Install Packer,Terraform, Azure CLI and VSCode Editor in order to create the project. Follow the below link to install the tools. My information based on Mac OOS. So provided shell commands are for Mac OS.
+
+Create Azure account https://azure.microsoft.com/en-us/free/ From above link you can create a azure account for the project to create your resources.
+
+Homebrew is the place where all packages can be found to install(https://brew.sh/)
+
+Install Packer
+
+Install Terraform CLI
+
+Install CLI
+
+Install Azure CLI
+
+Install VS Code Editor
+
+Install HashiCorp Terraform plugin for VS Code
+
+Install Git Client
+
+Installation procedures:
+
+Install Brew
+First you need to install Homebrew, a powerful package manager for Mac. You can install following below command.
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+Install XCode
+brew update xcode-select --install The reason to install xcode is that some software packages, usually open-source Unix packages, come with source code instead of a prebuilt binary file to install.
+
+Install Python 3:
+$ brew install python AZ CLI does not work without Python 3 install into the system.
+
+Selenium
+
+Download the latest Chrome driver.
+pip install -U selenium
+sudo apt-get install -y chromium-browser
+IMPORTANT You will need to add the chromedriver to PATH.
+In the Project Starter Resources folder, in the Selenium folder, execute the login.py file to open the demo site.
+
+JMeter
+Install JMeter.-https://jmeter.apache.org/download_jmeter.cgi
+Use JMeter to open the Starter.jmx file in the “Project Starter Resources” JMeter folder.
+Replace the APPSERVICEURL with the URL of your AppService once it's deployed.
+
+Postman
+Install Postman.-https://www.postman.com/downloads/
+Import into Postman the starterAPIs.json collection from the Project Starter Resources.
+
+AZ CLI Current Version (if installed)
+az --version
+
+Install Azure CLI (if not installed)
+brew update brew install azure-cli
+
+Upgrade az cli version
+az --version brew upgrade azure-cli [or] az upgrade az --version
+
+Install terraform from brew
+brew install terraform
+
+To confirm the installation, type terraform -v and you will get the current version as the output.
+
+Terraform - Authenticating using the Azure CLI:
+
+Azure Provider: Authenticating using the Azure CLI
+Azure CLI Login
+az login This command gets you to the azure portal where you have to provide credentials to get into the portal.
+
+List Subscriptions
+az account list This command get you the list of subscriptions associated with the account. In the list you will also get the subscription IDs.
+
+Set Specific Subscription (if we have multiple subscriptions)
+az account set --subscription="SUBSCRIPTION_ID" if you have more than one subscription IDs you need to set one to work for terraform. IF you have just one no need to do anything.
+
+Install Git Client
+Download Git Client
+This is required when we are working with Terraform Modules
+Now we are done with all our installation and get ready in order to write coding in Packer and Terraform
+
+Use Packer to create virtual image:
+
+Create Resource Group and location
+https://docs.microsoft.com/en-us/azure/virtual-machines/windows/build-image-with-packer In order to create Packer VM image you need to first create resource group and the location. There are so many option for location but i use "EAST-US". You can create login to the portal or using azure CLI. See the CLI command below to crease resource and location
+
+az group create -Name terraform-storage-rg -Location eastus
+
+Create Azure Storage Account
+- Create Resource Group
+Go to Resource Groups -> Add
+Resource Group: terraform-storage-rg
+Region: East US
+Click on Review + Create
+Click on Create
+- Create Azure Storage Account
+Go to Storage Accounts -> Add
+Resource Group: terraform-storage-rg
+Storage Account Name: udacitystorage
+Region: East US
+Performance: Standard
+Redundancy: Geo-Redundant Storage (GRS)
+In Data Protection, check the option Enable versioning for blobs
+REST ALL leave to defaults
+Click on Review + Create
+Click on Create
+
+- Create Container in Azure Storage Account
+Go to Storage Account -> udacitystorage -> Containers -> +Container
+Name: tfstatefiles
+Public Access Level: Private (no anonymous access)
+Click on Create
+
+- Create service principle
+Below command create a service principle and get you credentials to use to run packer and terraform.
+
+az ad sp create-for-rbac -n "Uacity_P3" --role Contributor --query "{ client_id: appId, client_secret: password, tenant_id: tenant }"
+
+
+"client_id": "21331ae3-df85-4cc9-be3e-445508caa15c",
+"client_secret": "ceceabee-a05b-4155-b05c-4b6a28371b2f",
+"tenant_id": "dd152091-7e9a-448e-b6a0-223f687a2d84"
+
+Find Subscription IDs
+you will get above credentials by creating service principle but you also need subscription IDs that you can have using the following
+
+   az account show --query "{ subscription_id: id }"
+
+   Subscription_id: "50d65e48-cd36-43c6-b861-3b1bcc7804e9"
+
+Terraform in Azure
+
+Configure the Linux VM for deployment:
+
+SSH into the VM using the Public IP
+Alternatively, you can use the 'Reset Password' function in Azure for the VM resource and then try SSH using those credentials.
+Follow the instructions to create an environment in Azure DevOps
+If the registration script shows "sudo: ./svc.sh: command not found":
+sudo bin/installdependencies.sh
+cd ..
+sudo rm -rf azagent
+Run the registration script again.
+Add your user to the sudoers file.
+Update azure-pipelines.yaml with the Environment, and run the pipeline. You can now deploy to the Linux VM.
+Configure Logging for the VM in the Azure Portal.
+
+Use Terraform to create the following resources for a specific environment tier:
+AppService
+Network
+Network Security Group
+Public IP
+Resource Group
+Linux VM (created by you -- use a Standard_B1s size for lowest cost)
+
+[Configure the storage account and state backend.](https://docs.microsoft.com/en-us/azure/developer/terraform/store-state-in-azure-storage)
+
+    For the sake of simplicity, run the bash script [config_storage_account.sh](config_storage_account.sh) in the local computer. Then replace the values below in [terraform/environments/test/main.tf](terraform/environments/test/main.tf) with the output from the Azure CLI in a block as
+
+    ```
+    terraform {
+        backend "azurerm" {
+            resource_group_name  = "${var.resource_group}"
+            storage_account_name = "tstate12785"
+            container_name       = "tstate"
+            key                  = "terraform.tfstate"
+        }
+    }
+    ```
+
+    . [Install Terraform Azure Pipelines Extension by Microsoft DevLabs.](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks)
+
+5. Create a new Service Connection by Project Settings >> Service connections >> New service connection >> Azure Resource Manager >> Next >> Service Principal (Automatic) >> Next >> Choose the correct subscription, and name such new service connection to Azure Resource Manager as `azurerm-sc`. This name will be used in [azure-pipelines.yml](azure-pipelines.yml).
+
+    ![Service connections 1](screenshots/service_connections_1.png)
+
+    ![Service connections 2](screenshots/service_connections_2.png)
+
+    6. Add TerraformTaskV1@0 tasks to perform `terraform init` and `terraform apply` in [azure-pipelines.yml](azure-pipelines.yml) to let them run in the Azure Pipelines build agent as if running in the local computer.
+
+7. Build FakeRestAPI artifact by archiving the entire fakerestapi directory into a zip file and publishing the pipeline artifact to the artifact staging directory.
+
+8. Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [http://lingchenzhu-webapi-appservice.azurewebsites.net/](http://lingchenzhu-webapi-appservice.azurewebsites.net/) where `lingchenzhu-webapi-appservice` is the Azure App Service resource name in small letters.
+
+    ![Deployed fakerestapi](screenshots/deployed_fakerestapi.png)
+
+9. After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.
+
+    ![Environments VM](screenshots/environments_vm.png)
+
+    Then Azure Pipelines can run bash commands on the virtual machine deployed by terraform.
+
+10. [Create an Azure Log Analytics workspace.](https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace-cli)
+
+    Run [deploy_log_analytics_workspace.sh](deploy_log_analytics_workspace.sh), or directly call `az deployment group create --resource-group udacity-ensuring-quality-releases --name deploy-log --template-file deploy_log_analytics_workspace.json`, and provide a string value for the parameter `workspaceName`, say `udacity-ensuring-quality-releases-log`.
+
+11. [Install Log Analytics agent on Linux computers.](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/agent-linux)
+
+    Follow the instructions to install the agent using wrapper script: `wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w <YOUR WORKSPACE ID> -s <YOUR WORKSPACE PRIMARY KEY>` on the terraform deployed VM.
+    
+    Both ID and primary key of the Log Analytics Workspace can be found in the Settings >> Agents management of the Log Analytics workspace and they can be set as secret variables for the pipeline.
+
+    After finishing installing the Log Analytics agent on the deployed VM, Settings >> Agents management should indicate that "1 Linux computers connected".
+
+    ![Log analytics workspace agents management](screenshots/log_analytics_workspace_agents_management.png)
+
+12. [Collect custom logs with Log Analytics agent in Azure Monitor.](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/data-sources-custom-logs)
+
+    ![Log analytics workspace custom logs](screenshots/log_analytics_workspace_custom_logs.png)
+
+13. [JMeter Command Line Options reference](http://sqa.fyicenter.com/1000056_JMeter_Command_Line_Options.html)
+
+14. [Newman Command Line Options reference](https://learning.postman.com/docs/running-collections/using-newman-cli/command-line-integration-with-newman/)
+
+15. Verify Azure Monitor Logs collected from the Log Analytics agent installed on the deployed VM.
+
+    ![Logs collected from VM](screenshots/azure_log_analytics_logs_from_vm.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Terraform_Pro3
+
+Step-05: Install Terraform Extension for Azure DevOps
+Terraform Extension for Azure DevOps
 
 Terraform in Azure
 Configure the storage account and state backend. Replace the values below in terraform/environments/test/main.tf with the output from the Azure CLI:
@@ -261,3 +508,10 @@ https://github.com/acouprie/udacity-azure-project3/blob/master/README.md
 
 
 https://dev.azure.com/enambd/Terraform_Project3/_build/results?buildId=500&view=artifacts&pathAsName=false&type=publishedArtifacts
+
+https://www.tutorialspoint.com/yaml/yaml_comments.htm
+
+
+self host  agent
+
+https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-osx?view=azure-devops

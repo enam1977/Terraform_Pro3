@@ -76,14 +76,21 @@ stages:
             deploy:
               steps:
                 - bash: |
-                    pwd
-                    python3 -V
-                    pip3 -V
-                    # unzip
-                    /usr/bin/chromium-browser --version
-                    /usr/bin/chromedriver --version
-                    # pip3 install selenium
-                    python3 -c "print('Selenium Version:', selenium.__version__)"
+                    #! /bin/bash
+                    sudo apt update
+                    sudo apt install software-properties-common -y
+                    sudo apt-add-repository ppa:universe -y
+                    sudo apt-get update
+                    sudo apt-get install zip unzip -y
+                    sudo apt-get install -y chromium-browser
+                    sudo apt-get install -y chromium-chromedriver
+                    sudo apt-get install python3-pip -y
+                    sudo python3 -m pip install --upgrade pip
+                    wget https://files.pythonhosted.org/packages/ed/9c/9030520bf6ff0b4c98988448a93c04fcbd5b13cd9520074d8ed53569ccfe/selenium-3.141.0.tar.gz
+                    tar -zxvf selenium-3.141.0.tar.gz 
+                    cd selenium-3.141.0/
+                    python3 setup.py install                            
+                    python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
                   displayName: Configure selenium and VM
   - stage: Tests
     jobs:

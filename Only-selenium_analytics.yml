@@ -17,7 +17,17 @@ stages:
           #   inputs:
           #     secureFile: 'terraform.tfvars'
           
+          - task: DownloadSecureFile@1
+            name: sshkey
+            displayName: "Download SSH Public Key"
+            inputs:
+              secureFile: "terraform-azure.pub"
 
+          - task: DownloadSecureFile@1
+            name: privatekey
+            displayName: "Download SSH private Key"
+            inputs:
+              secureFile: "terraform-azure.pem"
           - task: Bash@3
             displayName: "Copy SSH key & Azure Principal"
             inputs:
@@ -28,7 +38,7 @@ stages:
                 cp $(privatekey.secureFilePath) ~/.ssh
                 cp $(azureEnv.secureFilePath) $(System.DefaultWorkingDirectory)/terraform
                 chmod 400 ~/.ssh/terraform-azure.pub
-                chmod 400 ~/.ssh/terraform-azure
+                chmod 400 ~/.ssh/terraform-azure.pem
           
           
 

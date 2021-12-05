@@ -76,22 +76,32 @@ stages:
             deploy:
               steps:
                 - bash: |
-                    #! /bin/bash
-                    sudo apt update
-                    sudo apt install software-properties-common -y
-                    sudo apt-add-repository ppa:universe -y
-                    sudo apt-get update
-                    sudo apt-get install zip unzip -y
+                    pwd
+                    hostname
+                    uname -a
+                    cat /etc/*-release
+                    sudo apt-get install software-properties-common -y
+                    sudo apt-add-repository universe -y
+                    sudo apt-get update -y
+                    sudo apt-get install python3-pip -y
+                    sudo apt-get install unzip -y
                     sudo apt-get install -y chromium-browser
                     sudo apt-get install -y chromium-chromedriver
-                    sudo apt-get install python3-pip -y
-                    sudo python3 -m pip install --upgrade pip
+                    python3 -m pip install --upgrade pip
                     pip3 install selenium
-                    #wget https://files.pythonhosted.org/packages/ed/9c/9030520bf6ff0b4c98988448a93c04fcbd5b13cd9520074d8ed53569ccfe/selenium-3.141.0.tar.gz
-                    #tar -zxvf selenium-3.141.0.tar.gz 
-                    cd selenium-3.141.0/
-                                              
+                    python3 -V
+                    pip3 -V
+                    /usr/bin/chromium-browser --version
+                    /usr/bin/chromedriver --version
                     python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
+                    # Install Log Analytics agent on Linux computers (only need to run once)
+                    # wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
+                    # sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
+                    # sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
+                  env:  # To use secret variables in a script, we must explicitly map them as environment variables.
+                    AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
+                    AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
+                  
                   displayName: Configure selenium and VM
   - stage: Tests
     jobs:
@@ -105,25 +115,25 @@ stages:
             deploy:
               steps:
                 - bash: |
-                    pwd
                     cd $(Pipeline.Workspace)/drop-selenium
-                    find . -type f ! -name '$(Build.BuildId)-selenium.zip' -delete  
-                    unzip -o $(Pipeline.Workspace)/drop-selenium/$(Build.BuildId)-selenium -d .
+                    find . -type f ! -name 'selenium-$(Build.BuildId).zip' -delete  # delete everything except 'selenium-$(Build.BuildId).zip'
+                    unzip -o selenium-$(Build.BuildId).zip
                     pwd
-                    # add sudo here
+                    ls -la
                     sudo mkdir -p /var/log/selenium
                     sudo chmod 664 /var/log/selenium
-                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log
-                
+                    sudo python3 -u login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
                     mkdir -p log/selenium
+                    pwd
                     sudo cp /var/log/selenium/selenium-test.log log/selenium/selenium-test.log
-                    sudo chmod 775 logs/selenium/selenium-test.log
+                    ls -la
+                  
                     
                   displayName: Selenium tests
                 - task: PublishPipelineArtifact@1
                   displayName: Publish selenium logs
                   inputs:
-                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/*.txt"
+                    targetPath: '$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log'
                     artifactName: "drop-selenium-logs"

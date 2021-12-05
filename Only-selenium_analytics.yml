@@ -52,7 +52,7 @@ stages:
           - task: ArchiveFiles@2
             displayName: "Archive selenium"
             inputs:
-              rootFolderOrFile: "selenium"
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)/selenium'
               includeRootFolder: false
               archiveType: "zip"
               archiveFile: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-selenium.zip"
@@ -86,10 +86,11 @@ stages:
                     sudo apt-get install -y chromium-chromedriver
                     sudo apt-get install python3-pip -y
                     sudo python3 -m pip install --upgrade pip
-                    wget https://files.pythonhosted.org/packages/ed/9c/9030520bf6ff0b4c98988448a93c04fcbd5b13cd9520074d8ed53569ccfe/selenium-3.141.0.tar.gz
-                    tar -zxvf selenium-3.141.0.tar.gz 
+                    pip3 install selenium
+                    #wget https://files.pythonhosted.org/packages/ed/9c/9030520bf6ff0b4c98988448a93c04fcbd5b13cd9520074d8ed53569ccfe/selenium-3.141.0.tar.gz
+                    #tar -zxvf selenium-3.141.0.tar.gz 
                     cd selenium-3.141.0/
-                    python3 setup.py install                            
+                                              
                     python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
                   displayName: Configure selenium and VM
   - stage: Tests
@@ -107,24 +108,19 @@ stages:
                     pwd
                     cd $(Pipeline.Workspace)/drop-selenium
                     find . -type f ! -name '$(Build.BuildId)-selenium.zip' -delete  
-                    unzip -o $(Build.BuildId)-selenium.zip
+                    unzip -o $(Pipeline.Workspace)/drop-selenium/$(Build.BuildId)-selenium -d .
                     pwd
                     # add sudo here
                     sudo mkdir -p /var/log/selenium
-                    sudo chmod 775 /var/log/selenium
-                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.txt
-                    sudo chmod 775 /var/log/selenium/selenium-test.txt
-                    echo "Display /var/log/selenium/selenium-test.txt"
-                    sudo cat /var/log/selenium/selenium-test.txt
-                    echo "-------------------------------------------------"
-                    ls -la
+                    sudo chmod 664 /var/log/selenium
+                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log
+                
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
                     mkdir -p log/selenium
-                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium-test.txt
-                    cd log/selenium
-                    pwd
-                    ls -la
+                    sudo cp /var/log/selenium/selenium-test.log log/selenium/selenium-test.log
+                    sudo chmod 775 logs/selenium/selenium-test.log
+                    
                   displayName: Selenium tests
                 - task: PublishPipelineArtifact@1
                   displayName: Publish selenium logs

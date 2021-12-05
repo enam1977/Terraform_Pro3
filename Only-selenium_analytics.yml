@@ -65,24 +65,7 @@ stages:
 
   - stage: Deployment
     jobs:
-      - deployment: deployment_FakeRestAPI
-        displayName: Deploy FakeRestAPI
-        pool:
-          vmImage: "Ubuntu-18.04"
-        environment: "TEST"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureWebApp@1
-                  displayName: "Deploy Azure Web App"
-                  inputs:
-                    azureSubscription: "enamul01"
-                    appName: "webapp-webappservice"
-                    appType: webApp
-                    package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip
-                    deploymentMethod: zipDeploy
-
+      
       - deployment: VMDeploy
         displayName: Deploy a VM
         environment:

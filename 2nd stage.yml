@@ -241,8 +241,8 @@ stages:
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
                     mkdir -p logs/selenium
-                    sudo cp /var/logs/selenium/selenium-test.log.txt /var/logs/selenium/selenium-test.log
-                    udo chmod 775 logs/selenium/selenium-test.log
+                    # sudo cp /var/logs/selenium/selenium-test.log.txt /var/logs/selenium/selenium-test.log
+                    # udo chmod 775 logs/selenium/selenium-test.log
                     cd logs/selenium
                     pwd
                     ls -la
@@ -316,37 +316,39 @@ stages:
           vmImage: "ubuntu-18.04"
         steps:
           - task: NodeTool@0
-            displayName: Install Node v14.X
+            displayName: Install Node 14.x
             inputs:
               versionSpec: "14.x"
+
           - bash: |
               npm install -g newman
-              newman --version
-              # create log directory
+              newman -v
+              # create log dirctry
               mkdir -p log/newman
               pwd
               ls -la
             displayName: Install Newman
           - bash: |
-              newman run /postman/RegressionTest.json \
-                         -e /postman/Proj3.postman_environment.json \
-                         --reporters cli,junit \
+              newman run postman/RegressionTest.json \
+                         -e postman/Proj3.postman_environment.json \
+                         -r cli,junit \
                          --reporter-junit-export log/newman/regression-test.xml \
                          --suppress-exit-code
-            displayName: Newman regression test
+            displayName: Newman Regression Test
           - bash: |
               newman run postman/DataValidationTest.json \
-                         -e /postman/Proj3.postman_environment.json \
-                         --reporters cli,junit \
+                         -e postman/Proj3.postman_environment.json \
+                         -r cli,junit \
                          --reporter-junit-export log/newman/data-validation-test.xml \
                          --suppress-exit-code
-              ls -la $(System.DefaultWorkingDirectory)/log/newman/
-            displayName: Newman validation test
+              ls -la $(System.DefaultWorkingDirectory)/log/newman
+            displayName: Newman DataValidationTest Test
           - task: PublishPipelineArtifact@1
             displayName: Publish Newman logs
             inputs:
               targetPath: "$(System.DefaultWorkingDirectory)/log/newman"
               artifactName: "drop-newman-logs"
+
           - task: PublishTestResults@2
             displayName: "Publish Newman test results"
             inputs:

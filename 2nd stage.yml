@@ -180,39 +180,22 @@ stages:
             deploy:
               steps:
                 - bash: |
-                    pwd
-                    python3 -V
-                    pip3 -V
-                    # unzip
-                    /usr/bin/chromium-browser --version
-                    /usr/bin/chromedriver --version
-                    # pip3 install selenium
-                    sudo apt-get upgrade -y
-                    sudo apt-get install python3-pip -y
-                    sudo apt-get install unzip -y
+                    #! /bin/bash
+                    sudo apt update
+                    sudo apt install software-properties-common -y
+                    sudo apt-add-repository ppa:universe -y
+                    sudo apt-get update
+                    sudo apt-get install zip unzip -y
                     sudo apt-get install -y chromium-browser
-                    pip3 install selenium
-                    pip install pytest
-                    pip install pytest-html
-                    pip install chromedriver-py==88.0.4324.96
-                    pip install pytest-xdist
-                    pip install pytest-nunit
-                    sudo apt install google-chrome-stable
-                    pip install webdriver_manager
+                    sudo apt-get install -y chromium-chromedriver
+                    sudo apt-get install python3-pip -y
+                    sudo python3 -m pip install --upgrade pip
                     wget https://files.pythonhosted.org/packages/ed/9c/9030520bf6ff0b4c98988448a93c04fcbd5b13cd9520074d8ed53569ccfe/selenium-3.141.0.tar.gz
                     tar -zxvf selenium-3.141.0.tar.gz 
                     cd selenium-3.141.0/
                     python3 setup.py install                            
                     python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
-                    #Install Log Analytics agent on Linux computers (only need to run once)
-                    # wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
-                    # sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
-                    # sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
-                    export PATH=$PATH:'$(System.DefaultWorkingDirectory)/selenium'
-                  env: # To use secret variables in a script, we must explicitly map them as environment variables.
-                    AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
-                    AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
-              
+                    #selenium-test.log
                   displayName: Configure selenium
   - stage: Tests
     jobs:
@@ -226,25 +209,41 @@ stages:
             deploy:
               steps:
                 - bash: |
+                    
+                    cd $(Pipeline.Workspace)/drop-selenium
+                    find . -type f ! -name 'selenium-$(Build.BuildId).zip' -delete 
+                    unzip -o $(Pipeline.Workspace)/selenium-atf/selenium-$(Build.BuildId) -d .
+                    sudo mkdir -p /var/logs/selenium && sudo chmod 664 /var/logs/selenium
+                    sudo python3 -u run_ui_tests.py 2>&1 | sudo tee -a /var/logs/selenium/ui_tests.log
+                    # sudo python3 -u run_ui_tests.py | sudo dd of=/var/logs/selenium/ui_tests.log
+                    cd $(System.DefaultWorkingDirectory)
+                    mkdir -p logs/selenium
+                    sudo cp /var/logs/selenium/ui_tests.log logs/selenium/ui_tests.log
+                    sudo chmod 775 logs/selenium/ui_tests.log
+                    # cat logs/selenium/ui_tests.log
+
+                    
                     pwd
                     cd $(Pipeline.Workspace)/drop-selenium
                     find . -type f ! -name '$(Build.BuildId)-selenium.zip' -delete  
                     unzip -o $(Build.BuildId)-selenium.zip
                     pwd
                     # add sudo here
-                    sudo mkdir -p /var/log/selenium
+                    sudo mkdir -p /var/logs/selenium
                     sudo chmod 775 /var/log/selenium
-                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log
-                    sudo chmod 775 /var/log/selenium/selenium-test.log
-                    echo "Display /var/log/selenium/selenium-test.log
-                    sudo cat /var/log/selenium/selenium-test.log
-                    echo "-------------------------------------------------"
-                    ls -la
+                    sudo chmod 664 /var/logs/selenium
+                    sudo python3 login.py 2>&1 | sudo tee -a /var/logs/selenium/selenium-test.log
+                    sudo chmod 775 /var/logs/selenium/selenium-test.log
+                    #echo "Display /var/log/selenium/selenium-test.log
+                    #sudo cat /var/log/selenium/selenium-test.log
+                    #echo "-------------------------------------------------"
+                    #ls -la
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
-                    mkdir -p log/selenium
-                    sudo cp /var/log/selenium/selenium-test.log.txt /var/log/selenium/selenium-test.log
-                    cd log/selenium
+                    mkdir -p logs/selenium
+                    sudo cp /var/logs/selenium/selenium-test.log.txt /var/logs/selenium/selenium-test.log
+                    udo chmod 775 logs/selenium/selenium-test.log
+                    cd logs/selenium
                     pwd
                     ls -la
                   displayName: Selenium tests

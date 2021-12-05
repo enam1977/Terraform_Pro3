@@ -69,7 +69,7 @@ stages:
       - deployment: VMDeploy
         displayName: Deploy a VM
         environment:
-          name: "NEWTEST"
+          name: "udacity"
           resourceType: VirtualMachine
         strategy:
           runOnce:
@@ -90,7 +90,7 @@ stages:
       - deployment: test_vm
         displayName: Tests on VM
         environment:
-          name: "TEST"
+          name: "udacity"
           resourceType: VirtualMachine
         strategy:
           runOnce:

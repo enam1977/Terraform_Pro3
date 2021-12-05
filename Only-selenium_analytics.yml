@@ -112,16 +112,16 @@ stages:
                     # add sudo here
                     sudo mkdir -p /var/log/selenium
                     sudo chmod 775 /var/log/selenium
-                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log.txt
-                    sudo chmod 775 /var/log/selenium/selenium-test.log.txt
-                    echo "Display /var/log/selenium/selenium-test.log.txt"
-                    sudo cat /var/log/selenium/selenium-test.log.txt
+                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.txt
+                    sudo chmod 775 /var/log/selenium/selenium-test.txt
+                    echo "Display /var/log/selenium/selenium-test.txt"
+                    sudo cat /var/log/selenium/selenium-test.txt
                     echo "-------------------------------------------------"
                     ls -la
                     # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
                     cd $(System.DefaultWorkingDirectory)
                     mkdir -p log/selenium
-                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium-test.log.txt
+                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium-test.txt
                     cd log/selenium
                     pwd
                     ls -la
@@ -129,5 +129,5 @@ stages:
                 - task: PublishPipelineArtifact@1
                   displayName: Publish selenium logs
                   inputs:
-                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log.txt"
+                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.txt"
                     artifactName: "drop-selenium-logs"

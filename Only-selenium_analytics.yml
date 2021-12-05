@@ -1,0 +1,133 @@
+name: Azure Pipelines
+variables:
+  python.version: "3.7.6"
+
+stages:
+  - stage: Provision
+    displayName: Provision for Azure Pipeline
+    jobs:
+      - job: provision_azure_infrastructure
+        displayName: Provisioning AppService
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          # - task: DownloadSecureFile@1
+          #   name: tfvars
+          #   displayName: 'Download terraform.tfvars'
+          #   inputs:
+          #     secureFile: 'terraform.tfvars'
+          
+
+          - task: Bash@3
+            displayName: "Copy SSH key & Azure Principal"
+            inputs:
+              targetType: "inline"
+              script: |
+                mkdir -p ~/.ssh
+                cp $(sshkey.secureFilePath) ~/.ssh
+                cp $(privatekey.secureFilePath) ~/.ssh
+                cp $(azureEnv.secureFilePath) $(System.DefaultWorkingDirectory)/terraform
+                chmod 400 ~/.ssh/terraform-azure.pub
+                chmod 400 ~/.ssh/terraform-azure
+          
+          
+
+  - stage: Build
+    jobs:
+      - job: Build
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+
+          - task: ArchiveFiles@2
+            displayName: "Archive selenium"
+            inputs:
+              rootFolderOrFile: "selenium"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-selenium.zip"
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Selenium artifact
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-selenium.zip"
+              artifactName: "drop-selenium"
+
+  - stage: Deployment
+    jobs:
+      - deployment: deployment_FakeRestAPI
+        displayName: Deploy FakeRestAPI
+        pool:
+          vmImage: "Ubuntu-18.04"
+        environment: "TEST"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureWebApp@1
+                  displayName: "Deploy Azure Web App"
+                  inputs:
+                    azureSubscription: "enamul01"
+                    appName: "webapp-webappservice"
+                    appType: webApp
+                    package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip
+                    deploymentMethod: zipDeploy
+
+      - deployment: VMDeploy
+        displayName: Deploy a VM
+        environment:
+          name: "NEWTEST"
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - bash: |
+                    pwd
+                    python3 -V
+                    pip3 -V
+                    # unzip
+                    /usr/bin/chromium-browser --version
+                    /usr/bin/chromedriver --version
+                    # pip3 install selenium
+                    python3 -c "print('Selenium Version:', selenium.__version__)"
+                  displayName: Configure selenium and VM
+  - stage: Tests
+    jobs:
+      - deployment: test_vm
+        displayName: Tests on VM
+        environment:
+          name: "TEST"
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - bash: |
+                    pwd
+                    cd $(Pipeline.Workspace)/drop-selenium
+                    find . -type f ! -name '$(Build.BuildId)-selenium.zip' -delete  
+                    unzip -o $(Build.BuildId)-selenium.zip
+                    pwd
+                    # add sudo here
+                    sudo mkdir -p /var/log/selenium
+                    sudo chmod 775 /var/log/selenium
+                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log.txt
+                    sudo chmod 775 /var/log/selenium/selenium-test.log.txt
+                    echo "Display /var/log/selenium/selenium-test.log.txt"
+                    sudo cat /var/log/selenium/selenium-test.log.txt
+                    echo "-------------------------------------------------"
+                    ls -la
+                    # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
+                    cd $(System.DefaultWorkingDirectory)
+                    mkdir -p log/selenium
+                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium-test.log.txt
+                    cd log/selenium
+                    pwd
+                    ls -la
+                  displayName: Selenium tests
+                - task: PublishPipelineArtifact@1
+                  displayName: Publish selenium logs
+                  inputs:
+                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log.txt"
+                    artifactName: "drop-selenium-logs"

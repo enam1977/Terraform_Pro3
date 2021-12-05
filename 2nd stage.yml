@@ -28,6 +28,37 @@ stages:
               knownHostsEntry: "known_hosts"
               sshPublicKey: $(PUBLIC_KEY)
               sshKeySecureFile: "terraform-azure"
+          - task: DownloadSecureFile@1
+            name: sshkey
+            displayName: "Download SSH Public Key"
+            inputs:
+              secureFile: "terraform-azure.pub"
+
+          - task: DownloadSecureFile@1
+            name: privatekey
+            displayName: "Download SSH private Key"
+            inputs:
+              secureFile: "terraform-azure.pem"
+
+          - task: Bash@3
+            displayName: "Copy SSH key & Azure Principal"
+            inputs:
+              targetType: "inline"
+              script: |
+                mkdir -p ~/.ssh
+                cp $(sshkey.secureFilePath) ~/.ssh
+                cp $(privatekey.secureFilePath) ~/.ssh
+                cp $(azureEnv.secureFilePath) $(System.DefaultWorkingDirectory)/terraform
+                chmod 400 ~/.ssh/terraform-azure.pub
+                chmod 400 ~/.ssh/terraform-azure.pem
+          
+          # - bash: |
+          #     echo Set Azure EnvironmentVariables
+          #     cd $(System.DefaultWorkingDirectory)/terraform
+          #     ls -la
+          #     chmod 700 set_azure_env.sh
+          #     ./set_azure_env.sh
+          #   displayName: Set Azure Environment Variables
 
           - bash: |
               cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/

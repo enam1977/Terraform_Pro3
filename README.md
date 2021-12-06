@@ -554,9 +554,7 @@ Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The dep
 # Environments virtual Machine
 
 After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.
-
-    Terraform_Pro3/screenshot/VM_ENV.png
-
+  ![VM_ENV](screenshot/VM_ENV.png)
     Then Azure Pipelines can run bash commands on the virtual machine deployed by terraform.
 
 # Create Log Analytics workspace

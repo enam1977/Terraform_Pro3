@@ -126,39 +126,38 @@ az group create -Name terraform-storage-rg -Location eastus
 Create Azure Storage Account
 - Create Resource Group by the command:  az group create -Name terraform-storage-rg -Location eastus
 
-Go to Resource Groups -> Add
-Resource Group: terraform-storage-rg
-Region: East US
-Click on Review + Create
-Click on Create
+   Go to Resource Groups -> Add
+   Resource Group: terraform-storage-rg
+   Region: East US
+   Click on Review + Create
+   Click on Create
 
 - Create Azure Storage Account
-Go to Storage Accounts -> Add
-Resource Group: terraform-storage-rg
-Storage Account Name: udacitystorage
-Region: East US
-Performance: Standard
-Redundancy: Geo-Redundant Storage (GRS)
-In Data Protection, check the option Enable versioning for blobs
-REST ALL leave to defaults
-Click on Review + Create
-Click on Create
+   Go to Storage Accounts -> Add
+   Resource Group: terraform-storage-rg
+   Storage Account Name: udacitystorage
+   Region: East US
+   Performance: Standard
+   Redundancy: Geo-Redundant Storage (GRS)
+   In Data Protection, check the option Enable versioning for blobs
+   REST ALL leave to defaults
+   Click on Review + Create
+   Click on Create
 
 - Create Container in Azure Storage Account
-Go to Storage Account -> udacitystorage -> Containers -> +Container
-Name: tfstatefiles
-Public Access Level: Private (no anonymous access)
-Click on Create
+   Go to Storage Account -> udacitystorage -> Containers -> +Container
+   Name: tfstatefiles
+   Public Access Level: Private (no anonymous access)
+   Click on Create
 
 - Create service principle
-Below command create a service principle and get you credentials to use to run packer and terraform.
+   Below command create a service principle and get you credentials to use to run packer and terraform.
+   az ad sp create-for-rbac -n "Uacity_P3" --role Contributor --query "{ client_id: appId, client_secret: password, tenant_id: tenant }"
 
-az ad sp create-for-rbac -n "Uacity_P3" --role Contributor --query "{ client_id: appId, client_secret: password, tenant_id: tenant }"
 
-
-"client_id": "21331ae3-df85-4cc9-be3e-445508caa15c",
-"client_secret": "ceceabee-a05b-4155-b05c-4b6a28371b2f",
-"tenant_id": "dd152091-7e9a-448e-b6a0-223f687a2d84"
+   "client_id": "21331ae3-df85-4cc9-be3e-445508caa15c",
+   "client_secret": "ceceabee-a05b-4155-b05c-4b6a28371b2f",
+   "tenant_id": "dd152091-7e9a-448e-b6a0-223f687a2d84"
 
 Find Subscription IDs
 you will get above credentials by creating service principle but you also need subscription IDs that you can have using the following
@@ -328,7 +327,7 @@ terraform.tfvars
 
 
 
-![](screenshot//credentials -azure-library.png)
+![](screenshot/credentials -azure-library.png)
 
 #  Create a new Service Connection
 

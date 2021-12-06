@@ -548,8 +548,9 @@ stages:
 Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [https://webapp-webappservice.azurewebsites.net/] where `webapp-webappservice` is the Azure App Service deploy
 
     
-    Terraform_Pro3/screenshot/FAKE REST API_WEBAPP.png
-
+   ![] (./screenshot/FAKE REST API_WEBAPP.png)
+    
+    
 # Environments virtual Machine
 
 After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.

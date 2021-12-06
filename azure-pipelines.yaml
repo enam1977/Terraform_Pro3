@@ -1,27 +1,33 @@
-name: Azure Pipelines
-variables:
-  python.version: "3.7.6"
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - README.md
+      - .gitignore
+      - screenshots/
 
 stages:
   - stage: Provision
-    displayName: Provision for Azure Pipeline
     jobs:
       - job: provision_azure_infrastructure
-        displayName: Provisioning AppService
+        displayName: Provision Azure Infrastructure
         pool:
           vmImage: "ubuntu-18.04"
         steps:
-          # - task: DownloadSecureFile@1
-          #   name: tfvars
-          #   displayName: 'Download terraform.tfvars'
-          #   inputs:
-          #     secureFile: 'terraform.tfvars'
           - task: DownloadSecureFile@1
-            name: azureEnv
-            displayName: "Download Azure Principal"
+            name: tfvardef
+            displayName: Download terraform.tfvars
             inputs:
-              secureFile: "set_azure_env.sh"
+              secureFile: "terraform.tfvars"
 
+            # Needed for Terraform VM deployment
+          - task: InstallSSHKey@0
+            inputs:
+              knownHostsEntry: "known_hosts"
+              sshPublicKey: $(PUBLIC_KEY)
+              sshKeySecureFile: "id_rsa.pub"
           - task: DownloadSecureFile@1
             name: sshkey
             displayName: "Download SSH Public Key"
@@ -46,91 +52,308 @@ stages:
                 chmod 400 ~/.ssh/id_rsa.pub
                 chmod 400 ~/.ssh/id_rsa
 
-          - bash: |
-              echo Set Azure EnvironmentVariables
-              cd $(System.DefaultWorkingDirectory)/terraform
-              ls -la
-              chmod 700 set_azure_env.sh
-              ./set_azure_env.sh
-            displayName: Set Azure Environment Variables
-
-          - task: TerraformInstaller@0
-            displayName: Install Terraform
-            inputs:
-              terraformVersion: "0.14.8"
+          # - bash: |
+          #     echo Set Azure EnvironmentVariables
+          #     cd $(System.DefaultWorkingDirectory)/terraform
+          #     ls -la
+          #     chmod 700 set_azure_env.sh
+          #     ./set_azure_env.sh
+          #   displayName: Set Azure Environment Variables
 
           - bash: |
-              echo System Default Working Directory: $(System.DefaultWorkingDirectory)
-              echo Azure Principal at : $(principal.secureFilePath)
+              cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform/
+            displayName: Copy terraform.tfvars
+
+          - bash: |
+              echo Pipeline workspace dir is $(Pipeline.Workspace)
+              echo Terraform variable definition file is $(tfvardef.secureFilePath)
               cd $(Agent.TempDirectory)
               pwd
               ls -la
-              cat id_rsa.pub
+              cat terraform_azure.pub
               cd ~/.ssh/
               pwd
               ls -la
               cat known_hosts
+              # $(System.DefaultWorkingDirectory) is equivalent to $(Build.SourcesDirectory)
               cd $(System.DefaultWorkingDirectory)  
               pwd
               ls -la
-            displayName: Check build environment
+            displayName: Verify build environment (pre)
 
-          - task: TerraformTaskV1@0
-            displayName: Terraform Init
-            inputs:
-              provider: azurerm
-              command: init
-              backendServiceArm: "proj3"
-              backendAzureRmResourceGroupName: "proj3"
-              backendAzureRmStorageAccountName: "proj317406"
-              backendAzureRmContainerName: "proj3con1"
-              backendAzureRmKey: "terraform.tfstate"
-              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+          # install Terraform Azure Pipelines Extension by Microsoft DevLabs
+          # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
 
-          # - bash: |
-          #     echo unlock state blob
-          #     terraform force-unlock 35d91e94-b05b-7ec9-9c10-7d4f612c4f39
-          #   displayName: Unlock state blob
-
-          - task: TerraformTaskV1@0
-            displayName: Terraform Plan
-            inputs:
-              provider: azurerm
-              command: "plan"
-              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
-              environmentServiceNameAzureRM: "proj3"
-
-          - task: TerraformTaskV1@0
-            displayName: Terraform Apply
-            inputs:
-              provider: azurerm
-              command: "apply"
-              commandOptions: |
-                -auto-approve -lock=false
-              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
-              environmentServiceNameAzureRM: "proj3"
-
-  - stage: Build
+  - stage: Build_FakeRestAPI
     jobs:
-      - job: Build
+      - job: build_artifacts_FakeRestAPI
+        displayName: Artifacts_FakeRestAPI
         pool:
           vmImage: "ubuntu-18.04"
         steps:
-          # Needed for Terraform VM deployment
           - task: ArchiveFiles@2
-            displayName: "Archive FakeRestAPI"
+            displayName: Archive FakeRestAPI
             inputs:
-              rootFolderOrFile: "automatedtesting/jmeter/fakerestapi"
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/jmeter/fakerestapi"
               includeRootFolder: false
               archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip"
-
+              archiveFile: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
+              verbose: true
           - task: PublishPipelineArtifact@1
             displayName: Publish FakeRestAPI artifact
             inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip"
+              targetPath: "$(Build.ArtifactStagingDirectory)/fakerestapi-$(Build.BuildId).zip"
               artifactName: "drop-fakerestapi"
 
+  - stage: Build_Selenium
+    jobs:
+      - job: build_artifacts_Selenium
+        displayName: Artifacts_Selenium
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: ArchiveFiles@2
+            displayName: Archive Selenium
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/selenium"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+              verbose: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Selenium artifact
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/selenium-$(Build.BuildId).zip"
+              artifactName: "drop-selenium"
+
+  - stage: Build_terraform
+    jobs:
+      - job: build_artifacts_terraform
+        displayName: Artifacts_terraform
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: ArchiveFiles@2
+            displayName: Archive terraform
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/terraform"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
+              verbose: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish terraform artifact
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/terraform-$(Build.BuildId).zip"
+              artifactName: "drop-terraform"
+
+  - stage: Download_terraform
+    displayName: "Download Terraform Artif"
+    jobs:
+      - job: Build
+        displayName: DownloadTerraformCode
+        steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifactName: TerraformBuild
+              buildVersionToDownload: latest
+              downloadPath: $(system.DefaultWorkingDirectory)/terraform
+
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+            displayName: "Install Terraform 1.0.5"
+            inputs:
+              terraformVersion: 1.0.5
+
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+            displayName: "Terraform : init"
+            inputs:
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+              backendServiceArm: enamul01
+              backendAzureRmResourceGroupName: "terraform-storage-rg"
+              backendAzureRmStorageAccountName: udacitystorage1
+              backendAzureRmContainerName: tfstatefiles
+              backendAzureRmKey: "dev-terraform.tfstate"
+
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+            displayName: "Terraform : validate"
+            inputs:
+              command: validate
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+
+          # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+          #   displayName: "Terraform : plan"
+          #   inputs:
+          #     command: plan
+          #     workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+          #     commandOptions:
+          #     environmentServiceNameAzureRM: enamul01
+          #     #"-var-file=dev.tfvars"
+
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+            displayName: "Terraform : apply -auto-approve"
+            inputs:
+              command: apply
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+              commandOptions: "-auto-approve"
+              environmentServiceNameAzureRM: enamul01
+              #-var-file=dev.tfvars
+  - stage: Deployment
+    jobs:
+      - deployment: deployment_fakerestapi
+        displayName: Deploy FakeRestAPI
+        pool:
+          vmImage: "ubuntu-18.04"
+        environment: "udacity"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureWebApp@1
+                  displayName: Deploy Azure WebApp
+                  inputs:
+                    azureSubscription: "enamul01"
+                    appName: "webapp-webappservice"
+                    appType: webApp
+                    package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
+                    deploymentMethod: zipDeploy
+
+  - stage: Deploy
+    jobs:
+      - deployment: deployVM
+        pool:
+          vmImage: "ubuntu-18.04"
+        environment:
+          name: "TEST"
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - bash: |
+                    pwd
+                    hostname
+                    uname -a
+                    cat /etc/*-release
+                    sudo apt-get install software-properties-common -y
+                    sudo apt-add-repository universe -y
+                    sudo apt-get update -y
+                    sudo apt-get install python3-pip -y
+                    sudo apt-get install unzip -y
+                    sudo apt-get install -y chromium-browser
+                    sudo apt-get install -y chromium-chromedriver
+                    python3 -m pip install --upgrade pip
+                    pip3 install selenium
+                    python3 -V
+                    pip3 -V
+                    /usr/bin/chromium-browser --version
+                    /usr/bin/chromedriver --version
+                    python3 -c "import selenium; print('Selenium Version:', selenium.__version__)"
+                    # Install Log Analytics agent on Linux computers (only need to run once)
+                    # wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
+                    # sh onboard_agent.sh -w ${AZURE_LOG_ANALYTICS_ID} -s ${AZURE_LOG_ANALYTICS_PRIMARY_KEY}
+                    # sudo /opt/microsoft/omsagent/bin/service_control restart ${AZURE_LOG_ANALYTICS_ID}
+                  env: # To use secret variables in a script, we must explicitly map them as environment variables.
+                    AZURE_LOG_ANALYTICS_ID: $(AZURE_LOG_ANALYTICS_ID)
+                    AZURE_LOG_ANALYTICS_PRIMARY_KEY: $(AZURE_LOG_ANALYTICS_PRIMARY_KEY)
+                  displayName: Configure selenium
+  - stage: Tests
+    jobs:
+      - deployment: test_vm
+        displayName: Tests on VM
+        environment:
+          name: "TEST"
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - bash: |
+
+                    cd $(Pipeline.Workspace)/drop-selenium
+                    find . -type f ! -name 'selenium-$(Build.BuildId).zip' -delete  # delete everything except 'selenium-$(Build.BuildId).zip'
+                    unzip -o selenium-$(Build.BuildId).zip
+                    pwd
+                    ls -la
+                    sudo mkdir -p /var/log/selenium
+                    sudo chmod 664 /var/log/selenium
+                    sudo python3 -u login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log
+                    # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
+                    cd $(System.DefaultWorkingDirectory)
+                    mkdir -p log/selenium
+                    pwd
+                    sudo cp /var/log/selenium/selenium-test.log log/selenium/selenium-test.log
+                    ls -la
+                  displayName: Selenium tests
+                - task: PublishPipelineArtifact@1
+                  displayName: Publish selenium logs
+                  inputs:
+                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log"
+                    artifactName: "drop-selenium-logs"
+
+      - job: test_jmeter
+        displayName: Test JMeter
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - bash: |
+              sudo apt-get install openjdk-11-jre-headless -y
+              java -version
+              wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.tgz -O jmeter.tgz
+              tar xzvf jmeter.tgz
+              apache-jmeter-5.4/bin/jmeter --version
+              # create log directory
+              mkdir -p log/jmeter
+              pwd
+              ls -la
+            displayName: Install JMeter
+          - bash: |
+              apache-jmeter-5.4/bin/jmeter -n -t jmeter/stress-test.jmx \
+                                           -l log/jmeter/stress-test-result.csv \
+                                           -e -f -o log/jmeter/stress-test-html-report \
+                                           -j log/jmeter/jmeter-stress-test.log
+            displayName: JMeter stress test
+          - bash: |
+              apache-jmeter-5.4/bin/jmeter -n -t jmeter/endurance-test.jmx \
+                                           -l log/jmeter/endurance-test-result.csv \
+                                           -e -f -o log/jmeter/endurance-test-html-report \
+                                           -j log/jmeter/jmeter-endurance-test.log
+            displayName: JMeter endurance test
+          - task: ArchiveFiles@2
+            displayName: Archive JMeter stress test HTML report
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report-$(Build.BuildId).zip"
+              verbose: true
+          - task: ArchiveFiles@2
+            displayName: Archive JMeter endurance test HTML report
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report-$(Build.BuildId).zip"
+              verbose: true
+          - bash: |
+              rm -rf log/jmeter/stress-test-html-report
+              rm -rf log/jmeter/endurance-test-html-report
+              cd log/jmeter
+              pwd
+              ls -la
+            displayName: Delete original JMeter test HTML reports
+          - task: PublishPipelineArtifact@1
+            displayName: Publish JMeter logs
+            inputs:
+              targetPath: "$(System.DefaultWorkingDirectory)/log/jmeter"
+              artifactName: "drop-jmeter-logs"
+
+      - job: test_newman
+        displayName: Test Postman (using Newman CLI)
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
           - task: NodeTool@0
             displayName: Install Node 14.x
             inputs:
@@ -144,24 +367,21 @@ stages:
               pwd
               ls -la
             displayName: Install Newman
-
           - bash: |
-              newman run automatedtesting/postman/RegressionTest.json \
-                         -e automatedtesting/postman/Proj3.postman_environment.json \
+              newman run postman/RegressionTest.json \
+                         -e postman/Proj3.postman_environment.json \
                          -r cli,junit \
                          --reporter-junit-export log/newman/regression-test.xml \
                          --suppress-exit-code
             displayName: Newman Regression Test
-
           - bash: |
-              newman run automatedtesting/postman/DataValidationTest.json \
-                         -e automatedtesting/postman/Proj3.postman_environment.json \
+              newman run postman/DataValidationTest.json \
+                         -e postman/Proj3.postman_environment.json \
                          -r cli,junit \
                          --reporter-junit-export log/newman/data-validation-test.xml \
                          --suppress-exit-code
               ls -la $(System.DefaultWorkingDirectory)/log/newman
             displayName: Newman DataValidationTest Test
-
           - task: PublishPipelineArtifact@1
             displayName: Publish Newman logs
             inputs:
@@ -177,133 +397,55 @@ stages:
               mergeTestResults: true
               testRunTitle: "Publish Newman test results"
 
-          - task: ArchiveFiles@2
-            displayName: "Archive selenium"
-            inputs:
-              rootFolderOrFile: "automatedtesting/selenium"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-selenium.zip"
+  # - stage: Destroy
+  #   jobs:
+  #     - job: destroy_azure_infrastructure
+  #       displayName: Destroy Azure Infrastructure
+  #       pool:
+  #         vmImage: "ubuntu-18.04"
+  #       steps:
+  #         - task: DownloadSecureFile@1
+  #           name: tfvardef
+  #           displayName: Download terraform.tfvars
+  #           inputs:
+  #             secureFile: "terraform.tfvars"
 
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Selenium artifact
-            inputs:
-              targetPath: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-selenium.zip"
-              artifactName: "drop-selenium"
+  #         # Needed for Terraform VM deployment
+  #         - task: InstallSSHKey@0
+  #           inputs:
+  #             knownHostsEntry: "known_hosts"
+  #             sshPublicKey: $(PUBLIC_KEY)
+  #             sshKeySecureFile: "terraform-azure"
 
-  - stage: Deployment
-    jobs:
-      - deployment: deployment_FakeRestAPI
-        displayName: Deploy FakeRestAPI
-        pool:
-          vmImage: "Ubuntu-18.04"
-        environment: "TEST"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureWebApp@1
-                  displayName: "Deploy Azure Web App"
-                  inputs:
-                    azureSubscription: "proj3"
-                    appName: "QA-AppService"
-                    appType: webApp
-                    package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip
-                    deploymentMethod: zipDeploy
+  #         - bash: |
+  #             cp $(Agent.TempDirectory)/terraform.tfvars $(System.DefaultWorkingDirectory)/terraform
+  #           displayName: Copy terraform.tfvars
 
-      - deployment: VMDeploy
-        displayName: Deploy a VM
-        environment:
-          name: "NEWTEST"
-          resourceType: VirtualMachine
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - bash: |
-                    pwd
-                    python3 -V
-                    pip3 -V
-                    # unzip
-                    /usr/bin/chromium-browser --version
-                    /usr/bin/chromedriver --version
-                    # pip3 install selenium
-                    python3 -c "print('Selenium Version:', selenium.__version__)"
-                  displayName: Configure selenium and VM
+  #         # install Terraform Azure Pipelines Extension by Microsoft DevLabs
+  #         # https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
+  #         - task: TerraformInstaller@0
+  #           displayName: Install Terraform
+  #           inputs:
+  #             terraformVersion: "0.13.5"
 
-  - stage: Tests
-    jobs:
-      - deployment: test_vm
-        displayName: Tests on VM
-        environment:
-          name: "TEST"
-          resourceType: VirtualMachine
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - bash: |
-                    pwd
-                    cd $(Pipeline.Workspace)/drop-selenium
-                    find . -type f ! -name '$(Build.BuildId)-selenium.zip' -delete  
-                    unzip -o $(Build.BuildId)-selenium.zip
-                    pwd
-                    # add sudo here
-                    sudo mkdir -p /var/log/selenium
-                    sudo chmod 775 /var/log/selenium
-                    sudo python3 login.py 2>&1 | sudo tee -a /var/log/selenium/selenium-test.log.txt
-                    sudo chmod 775 /var/log/selenium/selenium-test.log.txt
-                    echo "Display /var/log/selenium/selenium-test.log.txt"
-                    sudo cat /var/log/selenium/selenium-test.log.txt
-                    echo "-------------------------------------------------"
-                    ls -la
-                    # copy selenium log file to $(System.DefaultWorkingDirectory)/log/selenium/
-                    cd $(System.DefaultWorkingDirectory)
-                    mkdir -p log/selenium
-                    sudo cp /var/log/selenium/selenium-test.log.txt log/selenium/selenium-test.log.txt
-                    cd log/selenium
-                    pwd
-                    ls -la
-                  displayName: Selenium tests
+  #         - task: TerraformTaskV1@0
+  #           displayName: Terraform Init
+  #           inputs:
+  #             provider: "azurerm"
+  #             command: "init"
+  #             backendServiceArm: "azurerm-sc"
+  #             backendAzureRmResourceGroupName: "tstate"
+  #             backendAzureRmStorageAccountName: "tstate12785"
+  #             backendAzureRmContainerName: "tstate"
+  #             backendAzureRmKey: "terraform.tfstate"
+  #             workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test"
 
-                - task: PublishPipelineArtifact@1
-                  displayName: Publish selenium logs
-                  inputs:
-                    targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log.txt"
-                    artifactName: "drop-selenium-logs"
-
-  - stage: JMeterTests
-    displayName: JMeter Tests
-    jobs:
-      - job: Jmeter
-        pool:
-          vmImage: "Ubuntu-18.04"
-        steps:
-          - task: JMeterInstaller@0
-            displayName: Install Jmeter
-            inputs:
-              jmeterVersion: "5.4.1"
-
-          - bash: |
-              pwd
-              #ls -la
-              mkdir -p log/jmeter_endurance_test_report
-              # touch endurance_test.csv
-
-              jmeter -n -t automatedtesting/jmeter/endurance_test.jmx -l log/endurance_test.jtl \
-                     -e -f -o  log/jmeter_endurance_test_report \
-            displayName: Run Endurance Test
-
-          - bash: |
-              pwd
-              mkdir -p log/jmeter_stress_test_report
-              ls -la
-              jmeter -n -t automatedtesting/jmeter/stress_test.jmx -l log/stress_test.jtl \
-                     -e -f -o  log/jmeter_stress_test_report \
-            displayName: Run Stress Test
-
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Jmeter Results
-            inputs:
-              targetPath: "$(System.DefaultWorkingDirectory)/log"
-              artifactName: "drop-jmeter-reports"
+  #         - task: TerraformTaskV1@0
+  #           displayName: Terraform Destroy
+  #           inputs:
+  #             provider: "azurerm"
+  #             command: "destroy"
+  #             commandOptions: |
+  #               -auto-approve
+  #             workingDirectory: "$(System.DefaultWorkingDirectory)/terraform/environments/test"
+  #             environmentServiceNameAzureRM: "azurerm-sc"

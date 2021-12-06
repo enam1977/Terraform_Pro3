@@ -154,11 +154,11 @@ Create Azure Storage Account
    Below command create a service principle and get you credentials to use to run packer and terraform.
    az ad sp create-for-rbac -n "Uacity_P3" --role Contributor --query "{ client_id: appId, client_secret: password, tenant_id: tenant }"
 
-
+```
    "client_id": "21331ae3-df85-4cc9-be3e-445508caa15c",
    "client_secret": "ceceabee-a05b-4155-b05c-4b6a28371b2f",
    "tenant_id": "dd152091-7e9a-448e-b6a0-223f687a2d84"
-
+```
 Find Subscription IDs
 you will get above credentials by creating service principle but you also need subscription IDs that you can have using the following
 
@@ -171,6 +171,7 @@ you will get above credentials by creating service principle but you also need s
 Use Terraform to create the following resources for a specific environment tier:
 AppService
 
+```
 resource "azurerm_app_service_plan" "test" {
   name                = "${var.application_type}-${var.resource_type}-test"
   location            = var.location
@@ -192,7 +193,7 @@ resource "azurerm_app_service" "test" {
     "WEBSITE_RUN_FROM_PACKAGE" = 0
   }
 }
-
+```
 Configure state backend.](https://docs.microsoft.com/en-us/azure/developer/terraform/store-state-in-azure-storage)
 Earlier i have created resources group, stoage account name and container name. Need the name of those resources to configure state backend.
 
@@ -210,7 +211,7 @@ Earlier i have created resources group, stoage account name and container name. 
 
 # Create Virtual Network
 
-
+```
 resource "azurerm_virtual_network" "vnet" {
   name                = "${local.resource_name_prefix}-${var.vnet_name}"
   address_space       = var.vnet_address_space
@@ -218,10 +219,10 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = data.azurerm_resource_group.rg.name
   tags                = local.common_tags
 }
-
+```
 # Network Security Group
 
-
+```
 resource "azurerm_linux_virtual_machine" "web_linuxvm" {
   name = "${local.resource_name_prefix}-web-linuxvm"
   #computer_name = "web-linux-vm"  # Hostname of the VM (Optional)
@@ -248,17 +249,18 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
 
 }
 
-
+```
 # Public IP
 
 # Resource Group
-    Resource Group has created earlier. Junt need to pull the date to use other resources to create.
-    
+  Resource Group has created earlier. Junt need to pull the date to use other resources to create.
+ ```
     data "azurerm_resource_group" "rg" {
     name = var.resource_group_name
-    
+  ```
 # Linux VM 
 
+```
 resource "azurerm_linux_virtual_machine" "web_linuxvm" {
   name = "${local.resource_name_prefix}-web-linuxvm"
   #computer_name = "web-linux-vm"  # Hostname of the VM (Optional)
@@ -284,7 +286,7 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
   }
 
 }
-
+```
 
 
 ## Create Azure DevOps Organization
@@ -333,6 +335,7 @@ Due to security issue, upload the following information Azure DevOps Pipeline Li
    terraform.tfvars
 
 
+https://github.com/enam1977/Terraform_Pro3/blob/main/screenshot/FAKE%20REST%20API_WEBAPP.png
 
 ![credentials](./screenshot/credentials -azure-library.png)
 

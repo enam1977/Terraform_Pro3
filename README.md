@@ -326,6 +326,8 @@ id_rsa
 id_rsa_pub
 terraform.tfvars
 
+
+
 ![](screenshot//credentials -azure-library.png)
 
 #  Create a new Service Connection

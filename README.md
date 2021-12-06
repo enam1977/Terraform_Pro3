@@ -167,7 +167,7 @@ you will get above credentials by creating service principle but you also need s
 
    Subscription_id: "50d65e48-cd36-43c6-b861-3b1bcc7804e9"
 
-Terraform in Azure
+# Terraform in Azure
 
 Use Terraform to create the following resources for a specific environment tier:
 AppService
@@ -195,10 +195,10 @@ resource "azurerm_app_service" "test" {
 }
 
 Configure state backend.](https://docs.microsoft.com/en-us/azure/developer/terraform/store-state-in-azure-storage)
+Earlier i have created resources group, stoage account name and container name. Need the name of those resources to configure state backend.
 
-    Earlier i have created resources group, stoage account name and container name. Need the name of those resources to configure state backend.
 
-    ```
+   
     terraform {
         backend "azurerm" {
             resource_group_name  = "${var.resource_group}"
@@ -207,7 +207,7 @@ Configure state backend.](https://docs.microsoft.com/en-us/azure/developer/terra
             key                  = "terraform.tfstate"
         }
     }
-    ```
+   
 
 # Create Virtual Network
 resource "azurerm_virtual_network" "vnet" {
@@ -326,7 +326,7 @@ id_rsa
 id_rsa_pub
 terraform.tfvars
 
-/Users/enamulhaque/Documents/AzureDevops/Udacity/Project3/Terraform_Pro3/screenshot/credentials -azure-library.png
+![](screenshot//credentials -azure-library.png)
 
 #  Create a new Service Connection
 

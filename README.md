@@ -569,7 +569,7 @@ stages:
     
 ###### Environments virtual Machine
 
-After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.
+* After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.
   
   ![VM_ENV](./screenshot/VM_ENV.png)
 
@@ -577,25 +577,26 @@ Then Azure Pipelines can run bash commands on the virtual machine deployed by te
 
 ###### Create Log Analytics workspace
 
-Sign in to the Azure portal at https://portal.azure.com
-In the Azure portal, click All services. In the list of resources, type Log Analytics. As you begin typing, the list filters based on your input. Select Log Analytics workspaces
-Click Add, and then provide values for the following options:
- 
-Select a Subscription, a Resource Group and  an available Region
-Provide a name for the new Log Analytics workspace
+* Sign in to the Azure portal at https://portal.azure.com
+* In the Azure portal, click All services. In the list of resources, type Log Analytics. As you begin typing, the list filters based on your input. 
+* Select Log Analytics workspaces
+* Click Add, and then provide values for the following options:
+  - Select a Subscription, a Resource Group and  an available Region
+* Provide a name for the new Log Analytics workspace
 
- you can also run the below command to create the workspace
+* you can also run the below command to create the workspace
 
-    Run `az deployment group create --resource-group terraform-storage-rg --name selenium-log --location East US
+    `az deployment group create --resource-group terraform-storage-rg --name selenium-log --location East US
 
-
-https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace-cli
+* Referenace
+      https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace-cli
 
 ###### Deploy selenium and get the logs in VM
+
 Below yml file to add in the azure-pipelines.yaml to deploy selenium file login.py in the VM and see the log result via custom log
 
-Install dependencises for selenium
-
+* Install dependencises for selenium
+```
 - stage: Deploy
     jobs:
       - deployment: deployVM
@@ -670,51 +671,51 @@ yml file for selenium testing
                   inputs:
                     targetPath: "$(System.DefaultWorkingDirectory)/log/selenium/selenium-test.log"
                     artifactName: "drop-selenium-logs"
-
-
+```
+* Below image shows azure pipeline selenium build and deploy 
 ![](./screenshot/stages_pipeleins.png)
 
 ###### Connect VM to Log Analytics
 
-Sign into the Azure portal.
-Select Browse on the left side of the portal, and then go to Log Analytics workspaces and select it.
-In your list of Log Analytics workspaces, select the one that you want to use with the Azure VM. My workspaces name is selenium-log that what i selected.
-Workspace Data Sources and click on Virtual Machine
-Select the virtual machine you want to add with the Log analytic 
-Click on connect.
-
-Both ID and primary key of the Log Analytics Workspace can be found in the Settings >> Agents management of the Log Analytics workspace and they can be set as secret variables for the pipeline.
-
-After finishing installing the Log Analytics agent on the deployed VM, Settings >> Agents management should indicate that "1 Linux computers connected".
+* Sign into the Azure portal.
+* Select Browse on the left side of the portal, and then go to Log Analytics workspaces and select it.
+* In your list of Log Analytics workspaces, select the one that you want to use with the Azure VM. My workspaces name is selenium-log that what i selected.
+* Workspace Data Sources and click on Virtual Machine
+* Select the virtual machine you want to add with the Log analytic 
+* Click on connect.
+* Both ID and primary key of the Log Analytics Workspace can be found in the Settings >> Agents management of the Log Analytics workspace and they can be set as   secret variables for the pipeline.
+* After finishing installing the Log Analytics agent on the deployed VM, Settings >> Agents management should indicate that "1 Linux computers connected".
+* Below image shows linux machnien has connected with log analytic and ID and primary key
 
    ![](./screenshot/Log_analytic_VM_CON.png)
    
 
  ###### Collect custom logs with Log Analytics agent in Azure Monitor
 
- Sign into the Azure portal.
-Select Browse on the left side of the portal, and then go to Log Analytics workspaces and select it.
-In your list of Log Analytics workspaces, select the one that you want to use with the Azure VM. My workspaces name is selenium-log that what i selected.
-Go to setting and select Custom Logs 
-Select add custom log
-create a sample text file that contain the entry in the following format and upload and hit next
+* Sign into the Azure portal.
+* Select Browse on the left side of the portal, and then go to Log Analytics workspaces and select it.
+* In your list of Log Analytics workspaces, select the one that you want to use with the Azure VM. My workspaces name is selenium-log that what i selected.
+* Go to setting and select Custom Logs 
+* Select add custom log
+* create a sample text file that contain the entry in the following format and upload and hit next
 
-. YYYY-MM-DD HH:MM:SS
-. M/D/YYYY HH:MM:SS AM/PM
-. Mon DD, YYYY HH:MM:SS
-. yyMMdd HH:mm:ss
-. ddMMyy HH:mm:ss
-. MMM d hh:mm:ss
-. dd/MMM/yyyy:HH:mm:ss zzz
-. yyyy-MM-ddTHH:mm:ssK
+- YYYY-MM-DD HH:MM:SS
+- M/D/YYYY HH:MM:SS AM/PM
+- Mon DD, YYYY HH:MM:SS
+- yyMMdd HH:mm:ss
+- ddMMyy HH:mm:ss
+- MMM d hh:mm:ss
+- dd/MMM/yyyy:HH:mm:ss zzz
+- yyyy-MM-ddTHH:mm:ssK
 
-Select Record delimiter "New Line" and hit next
-Select the  Type:linux and give a path wehre you want to see the log file.
+* Select Record delimiter "New Line" and hit next
+* Select the  Type:linux and give a path wehre you want to see the log file.
+* Below image shows custom logs came to VM and activities.
 
 ![](./screenshot/custom_log.png)
 
-Referance:
-https://docs.microsoft.com/en-us/azure/azure-monitor/agents/data-sources-custom-logs
+* Referance:
+      https://docs.microsoft.com/en-us/azure/azure-monitor/agents/data-sources-custom-logs
 
 ###### Verify Azure Monitor Logs collected from the Log Analytics agent installed on the deployed VM.
 

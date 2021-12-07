@@ -21,7 +21,7 @@ Homebrew is the place where all packages can be found to install(https://brew.sh
 
 ## Installation procedures:
 
-###### Install Brew
+#### Install Brew
 First you need to install Homebrew, a powerful package manager for Mac. You can install following below command.
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

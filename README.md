@@ -343,26 +343,29 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
    * id_rsa
    * id_rsa_pub
    * terraform.tfvars
-   * Reference 
-      https://github.com/enam1977/Terraform_Pro3/blob/main/screenshot/FAKE%20REST%20API_WEBAPP.png
+   * Below image shows credentials uploaded in the devops websites
 
       ![credentials](./screenshot/credentials_azure_library.png)
 
 ##### Create a new Service Connection
 
  * Go Project Settings >> Service connections >> New service connection >> Azure Resource Manager >> Next >> Service Principal (Automatic) >> Next >> Choose the    correct subscription, and name such new service connection to Azure Resource Manager as azurerm-sc. This name will be used in azure-pipelines.yml.
+ * Below image shows service connection in the devops.
 
       ![](./screenshot/service_connection.png)
 
 # Create Azure CI (Continuous Integration) Pipeline (Build Pipeline)
-Go to Azure DevOps -> Organization (enambd) -> Project (terraform_Project3) -> Pipelines -> Pipelines
-Click on New Pipeline
-Where is your code?: GitHub
-Follow browser redirect steps to integrate with Github Account
-Select a repository: enam1977/terraform-Pro3
-Configure your pipeline: Starter Pipeline
-Rename the Pipeline file name to whatever you like or keep as it is
-Build the below code using tasks listed below that will check the authentication and create resources.
+
+###### Create pipelines and add YML file
+
+* Go to Azure DevOps -> Organization (enambd) -> Project (terraform_Project3) -> Pipelines -> Pipelines
+* Click on New Pipeline
+* Where is your code?: GitHub
+* Follow browser redirect steps to integrate with Github Account
+* Select a repository: enam1977/terraform-Pro3
+* Configure your pipeline: Starter Pipeline
+* Rename the Pipeline file name to whatever you like or keep as it is
+* Build the below code using tasks listed below that will check the authentication and create resources.
 
 
   trigger:
@@ -503,12 +506,15 @@ stages:
               commandOptions: "-auto-approve"
               environmentServiceNameAzureRM: enamul01
 
-       ![](screenshot/Terraform_apply.png)
+* Image shows applied terrafrom through azure pipeleines to deploy resources in the azure portal.
+       
+    ![](screenshot/Terraform_apply.png)
 
 
 
-# Build and deploy REST API
-   All required resources have created in the azure portal. Now you can deploy REST API in the webapp services.
+###### Build and deploy REST API
+
+* All required resources have created in the azure portal. Now you can deploy REST API in the webapp services.
    Here is the YML code to build and deploy REST API.
 
 - stage: Build_FakeRestAPI
@@ -552,15 +558,15 @@ stages:
                     package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
                     deploymentMethod: zipDeploy
 
- Build FakeRestAPI artifact by archiving the entire fakerestapi directory into a zip file and publishing the pipeline artifact to the artifact staging directory.
+ * Build FakeRestAPI artifact by archiving the entire fakerestapi directory into a zip file and publishing the pipeline artifact to the artifact staging directory.
 
-Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [https://webapp-webappservice.azurewebsites.net/] where `webapp-webappservice` is the Azure App Service deploy
+* Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [https://webapp-webappservice.azurewebsites.net/] where `webapp-webappservice` is the Azure App Service deploy
 
     
    ![](./screenshot/FAKE_REST_API_WEBAPP.png)
     
     
-# Environments virtual Machine
+###### Environments virtual Machine
 
 After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.
   
@@ -568,7 +574,7 @@ After terraform deployed the virtual machine in Azure Pipelines, we need to manu
 
 Then Azure Pipelines can run bash commands on the virtual machine deployed by terraform.
 
-# Create Log Analytics workspace
+###### Create Log Analytics workspace
 
 Sign in to the Azure portal at https://portal.azure.com
 In the Azure portal, click All services. In the list of resources, type Log Analytics. As you begin typing, the list filters based on your input. Select Log Analytics workspaces
@@ -583,7 +589,8 @@ Provide a name for the new Log Analytics workspace
 
 
 https://docs.microsoft.com/en-us/azure/azure-monitor/learn/quick-create-workspace-cli
-# Deploy selenium and get the logs in VM
+
+###### Deploy selenium and get the logs in VM
 Below yml file to add in the azure-pipelines.yaml to deploy selenium file login.py in the VM and see the log result via custom log
 
 Install dependencises for selenium
@@ -666,7 +673,7 @@ yml file for selenium testing
 
 ![](./screenshot/stages_pipeleins.png)
 
-# Connect VM to Log Analytics
+###### Connect VM to Log Analytics
 
 Sign into the Azure portal.
 Select Browse on the left side of the portal, and then go to Log Analytics workspaces and select it.
@@ -682,7 +689,7 @@ After finishing installing the Log Analytics agent on the deployed VM, Settings 
    ![](./screenshot/Log_analytic_VM_CON.png)
    
 
- # Collect custom logs with Log Analytics agent in Azure Monitor
+ ###### Collect custom logs with Log Analytics agent in Azure Monitor
 
  Sign into the Azure portal.
 Select Browse on the left side of the portal, and then go to Log Analytics workspaces and select it.
@@ -708,7 +715,7 @@ Select the  Type:linux and give a path wehre you want to see the log file.
 Referance:
 https://docs.microsoft.com/en-us/azure/azure-monitor/agents/data-sources-custom-logs
 
-# Verify Azure Monitor Logs collected from the Log Analytics agent installed on the deployed VM.
+###### Verify Azure Monitor Logs collected from the Log Analytics agent installed on the deployed VM.
 
 ![](./screenshot/selenium_logs.png)
 

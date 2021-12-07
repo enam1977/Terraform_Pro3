@@ -494,7 +494,7 @@ stages:
               commandOptions: "-auto-approve"
               environmentServiceNameAzureRM: enamul01
 
-       /Users/enamulhaque/Documents/AzureDevops/Udacity/Project3/Terraform_Pro3/screenshot/Terraform_apply.png
+       ![](screenshot/Terraform_apply.png)
 
 
 
@@ -548,14 +548,16 @@ stages:
 Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [https://webapp-webappservice.azurewebsites.net/] where `webapp-webappservice` is the Azure App Service deploy
 
     
-   ![] (./screenshot/FAKE REST API_WEBAPP.png)
+   ![](./screenshot/FAKE REST API_WEBAPP.png)
     
     
 # Environments virtual Machine
 
 After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.
+  
   ![VM_ENV](screenshot/VM_ENV.png)
-    Then Azure Pipelines can run bash commands on the virtual machine deployed by terraform.
+
+Then Azure Pipelines can run bash commands on the virtual machine deployed by terraform.
 
 # Create Log Analytics workspace
 
@@ -653,7 +655,7 @@ yml file for selenium testing
                     artifactName: "drop-selenium-logs"
 
 
-Terraform_Pro3/screenshot/stages_pipeleins.png
+![](screenshot/stages_pipeleins.png)
 
 # Connect VM to Log Analytics
 
@@ -668,7 +670,7 @@ Both ID and primary key of the Log Analytics Workspace can be found in the Setti
 
 After finishing installing the Log Analytics agent on the deployed VM, Settings >> Agents management should indicate that "1 Linux computers connected".
 
-    Terraform_Pro3/screenshot/Log analytic VM_CON.png
+   ![](screenshot/Log analytic VM_CON.png)
 
  # Collect custom logs with Log Analytics agent in Azure Monitor
 
@@ -691,14 +693,14 @@ yyyy-MM-ddTHH:mm:ssK
 Select Record delimiter "New Line" and hit next
 Select the  Type:linux and give a path wehre you want to see the log file.
 
-Terraform_Pro3/screenshot/custom log.png
+![](screenshot/custom log.png)
 
 Referance:
 https://docs.microsoft.com/en-us/azure/azure-monitor/agents/data-sources-custom-logs
 
 # Verify Azure Monitor Logs collected from the Log Analytics agent installed on the deployed VM.
 
-Terraform_Pro3/screenshot/selenium logs.png
+![](screenshot/selenium logs.png)
 
 JMeter Command Line Options reference]
 

@@ -164,13 +164,13 @@ Configure the storage account and state backend. Replace the values below in ter
 * Find Subscription IDs
   you will get above credentials by creating service principle but you also need subscription IDs that you can have using the following
 
-   az account show --query "{ subscription_id: id }"
+      az account show --query "{ subscription_id: id }"
 
    Subscription_id: "50d65e48-cd36-43c6-b861-3b1bcc7804e9"
 
-# Terraform in Azure
+# Deploy Terraform in Azure 
 
-Use Terraform to create the following resources for a specific environment tier:
+##### Use Terraform to create the following resources for a specific environment tier:
 AppService
 
 ```
@@ -196,10 +196,10 @@ resource "azurerm_app_service" "test" {
   }
 }
 ```
-Configure state backend.](https://docs.microsoft.com/en-us/azure/developer/terraform/store-state-in-azure-storage)
-Earlier i have created resources group, stoage account name and container name. Need the name of those resources to configure state backend.
+##### Configure state backend.](https://docs.microsoft.com/en-us/azure/developer/terraform/store-state-in-azure-storage)
+  Earlier i have created resources group, stoage account name and container name. Need the name of those resources to configure state backend.
 
-
+```
    
     terraform {
         backend "azurerm" {
@@ -210,8 +210,8 @@ Earlier i have created resources group, stoage account name and container name. 
         }
     }
    
-
-# Create Virtual Network
+```
+##### Create Virtual Network
 
 ```
 resource "azurerm_virtual_network" "vnet" {
@@ -222,7 +222,7 @@ resource "azurerm_virtual_network" "vnet" {
   tags                = local.common_tags
 }
 ```
-# Network Security Group
+##### Network Security Group
 
 ```
 resource "azurerm_linux_virtual_machine" "web_linuxvm" {
@@ -252,16 +252,25 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
 }
 
 ```
-# Public IP
+##### Public IP
+```
+resource "azurerm_public_ip" "web_publicip" {
+  name                = "${local.resource_name_prefix}-publicip"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = var.resource_group_location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  tags                = local.common_tags
+}
+```
 
-# Resource Group
+##### Resource Group
   Resource Group has created earlier. Junt need to pull the date to use other resources to create.
  ```
     data "azurerm_resource_group" "rg" {
     name = var.resource_group_name
   ```
-# Linux VM 
-
+##### Create Linux VM 
 ```
 resource "azurerm_linux_virtual_machine" "web_linuxvm" {
   name = "${local.resource_name_prefix}-web-linuxvm"
@@ -290,62 +299,60 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
 }
 ```
 
-
 ## Create Azure DevOps Organization
 
-# Create Azure DevOps Organization
+##### Create Azure DevOps Organization
 
-   Understand about Azure DevOps Agents and Free-Tier Limits
-   Navigate to https://dev.azure.com
-   Click on Sign in to Azure DevOps
-   Provide your Azure Cloud admin user
-   Username: XXXXXXXXXXXXXX
-   Password: XXXXXXXXXXXXXX
-   Click on create New Organization
-   Name your Azure DevOps organization: stacksimplify1
-   We'll host your projects in: Choose the location (Azure selects based on current location where you are accessing from)
-   Enter the characters you see:
-   Click on Continue
+   * Understand about Azure DevOps Agents and Free-Tier Limits
+   * Navigate to https://dev.azure.com
+   * Click on Sign in to Azure DevOps
+   * Provide your Azure Cloud admin user
+   * Username: XXXXXXXXXXXXXX
+   * Password: XXXXXXXXXXXXXX
+   * Click on create New Organization
+   * Name your Azure DevOps organization: stacksimplify1
+   * We'll host your projects in: Choose the location (Azure selects based on current location where you are accessing from)
+   * Enter the characters you see:
+   * Click on Continue
 
-# Request for Azure DevOps Parallelism
+##### Request for Azure DevOps Parallelism
 
-   Azure DevOps Parallelism Free Tier Request Form
-   https://forms.office.com/pages/responsepage.aspx?id=v4j5cvGGr0GRqy180BHbR63mUWPlq7NEsFZhkyH8jChUMlM3QzdDMFZOMkVBWU5BWFM3SDI2QlRBSC4u
+   * Azure DevOps Parallelism Free Tier Request Form
+      https://forms.office.com/pages/responsepage.aspx?id=v4j5cvGGr0GRqy180BHbR63mUWPlq7NEsFZhkyH8jChUMlM3QzdDMFZOMkVBWU5BWFM3SDI2QlRBSC4u
 
-# Install Terraform Extension for Azure DevOps
+##### Install Terraform Extension for Azure DevOps
 
-   Terraform Extension for Azure DevOps
-   https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
+   * Terraform Extension for Azure DevOps
+      https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks
 
-# Create New Project in Azure DevOps Organization
+##### Create New Project in Azure DevOps Organization
 
-   Click on New Project
-   Project Name: terraform-pro3
-   Description: Udacity project 3 azure pipeline
-   Visibility: Private
-   Click on Create
+  * Click on New Project
+  * Project Name: terraform-pro3
+  * Description: Udacity project 3 azure pipeline
+  * Visibility: Private
+  * Click on Create
 
-# Understand Azure Pipelines
-   Understand about Azure Pipelines
-   Pipeline Hierarchial Flow: Stages -> Stage -> Jobs -> Job -> Steps -> Task1, Task2
+##### Understand Azure Pipelines
+   * Understand about Azure Pipelines
+   * Pipeline Hierarchial Flow: Stages -> Stage -> Jobs -> Job -> Steps -> Task1, Task2
 
-# Store credentials in azure pipeline
-Due to security issue, upload the following information Azure DevOps Pipeline Library as a secure file
+##### Store credentials in azure pipeline
+   Due to security issue, upload the following information Azure DevOps Pipeline Library as a secure file
 
-   id_rsa
-   id_rsa_pub
-   terraform.tfvars
+   * id_rsa
+   * id_rsa_pub
+   * terraform.tfvars
+   * Reference 
+      https://github.com/enam1977/Terraform_Pro3/blob/main/screenshot/FAKE%20REST%20API_WEBAPP.png
 
+      ![credentials](./screenshot/credentials_azure_library.png)
 
-https://github.com/enam1977/Terraform_Pro3/blob/main/screenshot/FAKE%20REST%20API_WEBAPP.png
+##### Create a new Service Connection
 
-![credentials](./screenshot/credentials_azure_library.png)
+ * Go Project Settings >> Service connections >> New service connection >> Azure Resource Manager >> Next >> Service Principal (Automatic) >> Next >> Choose the    correct subscription, and name such new service connection to Azure Resource Manager as azurerm-sc. This name will be used in azure-pipelines.yml.
 
-#  Create a new Service Connection
-
- Go Project Settings >> Service connections >> New service connection >> Azure Resource Manager >> Next >> Service Principal (Automatic) >> Next >> Choose the correct subscription, and name such new service connection to Azure Resource Manager as azurerm-sc. This name will be used in azure-pipelines.yml.
-
-![](./screenshot/service_connection.png)
+      ![](./screenshot/service_connection.png)
 
 # Create Azure CI (Continuous Integration) Pipeline (Build Pipeline)
 Go to Azure DevOps -> Organization (enambd) -> Project (terraform_Project3) -> Pipelines -> Pipelines

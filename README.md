@@ -505,6 +505,7 @@ stages:
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
               commandOptions: "-auto-approve"
               environmentServiceNameAzureRM: enamul01
+  ```
 
 * Image shows applied terrafrom through azure pipeleines to deploy resources in the azure portal.
        
@@ -516,7 +517,7 @@ stages:
 
 * All required resources have created in the azure portal. Now you can deploy REST API in the webapp services.
    Here is the YML code to build and deploy REST API.
-
+```
 - stage: Build_FakeRestAPI
     jobs:
       - job: build_artifacts_FakeRestAPI

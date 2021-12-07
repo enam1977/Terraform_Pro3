@@ -555,7 +555,7 @@ Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The dep
 
 After terraform deployed the virtual machine in Azure Pipelines, we need to manually register such virtual machine in Pipelines >> Environments >> TEST >> Add resource >> Select "Virtual machines" >> Next >> In Operating system, select "Linux". Then copy the Registration script, manually ssh login to the virtual machine, paste it in the console and run. Such registration script makes the deployed Linux virtual machine an Azure Pipelines agent so Azure Pipelines can run bash commands there.
   
-  ![VM_ENV](screenshot/VM_ENV.png)
+  ![VM_ENV](./screenshot/VM_ENV.png)
 
 Then Azure Pipelines can run bash commands on the virtual machine deployed by terraform.
 
@@ -655,7 +655,7 @@ yml file for selenium testing
                     artifactName: "drop-selenium-logs"
 
 
-![](screenshot/stages_pipeleins.png)
+![](./screenshot/stages_pipeleins.png)
 
 # Connect VM to Log Analytics
 
@@ -670,7 +670,7 @@ Both ID and primary key of the Log Analytics Workspace can be found in the Setti
 
 After finishing installing the Log Analytics agent on the deployed VM, Settings >> Agents management should indicate that "1 Linux computers connected".
 
-   ![](screenshot/Log analytic VM_CON.png)
+   ![](./screenshot/Log analytic VM_CON.png)
    
 
  # Collect custom logs with Log Analytics agent in Azure Monitor
@@ -682,26 +682,26 @@ Go to setting and select Custom Logs
 Select add custom log
 create a sample text file that contain the entry in the following format and upload and hit next
 
-YYYY-MM-DD HH:MM:SS
-M/D/YYYY HH:MM:SS AM/PM
-Mon DD, YYYY HH:MM:SS
-yyMMdd HH:mm:ss
-ddMMyy HH:mm:ss
-MMM d hh:mm:ss
-dd/MMM/yyyy:HH:mm:ss zzz
-yyyy-MM-ddTHH:mm:ssK
+. YYYY-MM-DD HH:MM:SS
+. M/D/YYYY HH:MM:SS AM/PM
+. Mon DD, YYYY HH:MM:SS
+. yyMMdd HH:mm:ss
+. ddMMyy HH:mm:ss
+. MMM d hh:mm:ss
+. dd/MMM/yyyy:HH:mm:ss zzz
+. yyyy-MM-ddTHH:mm:ssK
 
 Select Record delimiter "New Line" and hit next
 Select the  Type:linux and give a path wehre you want to see the log file.
 
-![](screenshot/custom log.png)
+![](./screenshot/custom log.png)
 
 Referance:
 https://docs.microsoft.com/en-us/azure/azure-monitor/agents/data-sources-custom-logs
 
 # Verify Azure Monitor Logs collected from the Log Analytics agent installed on the deployed VM.
 
-![](screenshot/selenium logs.png)
+![](./screenshot/selenium logs.png)
 
 JMeter Command Line Options reference]
 

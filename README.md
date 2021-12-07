@@ -21,25 +21,25 @@ Homebrew is the place where all packages can be found to install(https://brew.sh
 
 ## Installation procedures:
 
-##### Install Brew
-First you need to install Homebrew, a powerful package manager for Mac. You can install following below command.
+###### Install Brew
+* First you need to install Homebrew, a powerful package manager for Mac. You can install following below command.
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-Install XCode
-brew update xcode-select --install The reason to install xcode is that some software packages, usually open-source Unix packages, come with source code instead of a prebuilt binary file to install.
+###### Install XCode
+* brew update xcode-select --install The reason to install xcode is that some software packages, usually open-source Unix packages, come with source code instead of a prebuilt binary file to install.
 
-Install Python 3:
-$ brew install python AZ CLI does not work without Python 3 install into the system.
+###### Install Python 3:
+* $ brew install python AZ CLI does not work without Python 3 install into the system.
 
-Selenium
-Download the latest Chrome driver.
-pip install -U selenium
-sudo apt-get install -y chromium-browser
-IMPORTANT You will need to add the chromedriver to PATH.
-In the Project Starter Resources folder, in the Selenium folder, execute the login.py file to open the demo site.
+###### Selenium
+* Download the latest Chrome driver.
+* pip install -U selenium
+* sudo apt-get install -y chromium-browser
+* IMPORTANT You will need to add the chromedriver to PATH.
+* In the Project Starter Resources folder, in the Selenium folder, execute the login.py file to open the demo site.
 
-JMeter
+###### JMeter
 Install JMeter.-https://jmeter.apache.org/download_jmeter.cgi
 Use JMeter to open the Starter.jmx file in the “Project Starter Resources” JMeter folder.
 Replace the APPSERVICEURL with the URL of your AppService once it's deployed.

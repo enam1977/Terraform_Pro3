@@ -8,8 +8,8 @@ Create Azure account https://azure.microsoft.com/en-us/free/ From above link you
 
 Homebrew is the place where all packages can be found to install(https://brew.sh/)
 
-. Install Packe
-. Install Terraform CLI
+.  Install Packe
+.  Install Terraform CLI
 . Install CLI
 . Install Azure CLI
 . Install VS Code Editor

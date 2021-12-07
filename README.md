@@ -1,23 +1,23 @@
 
 
-## Title: Project 3-Ensuring Quality Releases
+# Title: Project 3-Ensuring Quality Releases
 
-# Prerequisites:
+## Pre-requisites:
 
 Create Azure account https://azure.microsoft.com/en-us/free/ From above link you can create a azure account for the project to create your resources.
 
 Homebrew is the place where all packages can be found to install(https://brew.sh/)
 
-.  Install Packe
-.  Install Terraform CLI
-. Install CLI
-. Install Azure CLI
-. Install VS Code Editor
-. Install HashiCorp Terraform plugin for VS Code
-. Install Git Client
-. Install Postman
-. Install Selenium and webdrive
-. Install Jmeter
+* Install Packe
+* Install Terraform CLI
+* Install CLI
+* Install Azure CLI
+* Install VS Code Editor
+* Install HashiCorp Terraform plugin for VS Code
+* Install Git Client
+* Install Postman
+* Install Selenium and webdrive
+* Install Jmeter
 
 # Installation procedures:
 

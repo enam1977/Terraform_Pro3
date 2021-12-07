@@ -392,7 +392,7 @@ stages:
             inputs:
               secureFile: "terraform.tfvars"
 
-            # Needed for Terraform VM deployment
+            
           - task: InstallSSHKey@0
             inputs:
               knownHostsEntry: "known_hosts"

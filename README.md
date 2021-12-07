@@ -40,78 +40,75 @@ Homebrew is the place where all packages can be found to install(https://brew.sh
 * In the Project Starter Resources folder, in the Selenium folder, execute the login.py file to open the demo site.
 
 ###### JMeter
-Install JMeter.-https://jmeter.apache.org/download_jmeter.cgi
-Use JMeter to open the Starter.jmx file in the “Project Starter Resources” JMeter folder.
-Replace the APPSERVICEURL with the URL of your AppService once it's deployed.
+* Install JMeter.-https://jmeter.apache.org/download_jmeter.cgi
+* Use JMeter to open the Starter.jmx file in the “Project Starter Resources” JMeter folder.
+* Replace the APPSERVICEURL with the URL of your AppService once it's deployed.
 
-Postman
-Install Postman.-https://www.postman.com/downloads/
-Import into Postman the starterAPIs.json collection from the Project Starter Resources.
+###### Postman
+* Install Postman.-https://www.postman.com/downloads/
+* Import into Postman the starterAPIs.json collection from the Project Starter Resources.
 
-AZ CLI Current Version (if installed)
-az --version
+###### AZ CLI Current Version (if installed)
+* az --version
 
-Install Azure CLI (if not installed)
-brew update brew install azure-cli
+###### Install Azure CLI (if not installed)
+* brew update brew install azure-cli
 
-Upgrade az cli version
-az --version brew upgrade azure-cli [or] az upgrade az --version
+###### Upgrade az cli version
+* az --version brew upgrade azure-cli [or] az upgrade az --version
 
-Install terraform from brew
-brew install terraform
+###### Install terraform from brew
+* brew install terraform
+* To confirm the installation, type terraform -v and you will get the current version as the output.
 
-To confirm the installation, type terraform -v and you will get the current version as the output.
+###### Terraform - Authenticating using the Azure CLI:
 
-Terraform - Authenticating using the Azure CLI:
+* Azure Provider: Authenticating using the Azure CLI
+* Azure CLI Login
+* az login This command gets you to the azure portal where you have to provide credentials to get into the portal.
 
-Azure Provider: Authenticating using the Azure CLI
-Azure CLI Login
-az login This command gets you to the azure portal where you have to provide credentials to get into the portal.
+###### List Subscriptions
+* az account list This command get you the list of subscriptions associated with the account. In the list you will also get the subscription IDs.
+* Set Specific Subscription (if we have multiple subscriptions)
+* az account set --subscription="SUBSCRIPTION_ID" if you have more than one subscription IDs you need to set one to work for terraform. IF you have just one no     need to do anything.
 
-List Subscriptions
-az account list This command get you the list of subscriptions associated with the account. In the list you will also get the subscription IDs.
+###### Install Git Client
+* Download Git Client
+  This is required when we are working with Terraform Modules
 
-Set Specific Subscription (if we have multiple subscriptions)
-az account set --subscription="SUBSCRIPTION_ID" if you have more than one subscription IDs you need to set one to work for terraform. IF you have just one no need to do anything.
+##Create Github Repository and Check-In Files
 
-Install Git Client
-Download Git Client
-This is required when we are working with Terraform Modules
+###### Create new github Repository
+* URL: github.com
+* Click on Create a new repository
+* Repository Name: any name you like
+* Description: Udacity project 3 
+* Repo Type: Public / Private
+* Initialize this repository with:
+* CHECK - Add a README file
+* CHECK - Add .gitignore
+* Select .gitignore Template: Terraform
+* Click on Create repository
 
-# Create Github Repository and Check-In Files
+###### Clone Github Repo
+* git clone https://github.com/<YOUR_GITHUB_ID>/<YOUR_REPO>.git
+* git clone git@github.com:enam1977/Terraform_Pro3.git
 
-Create new github Repository
-URL: github.com
-Click on Create a new repository
-Repository Name: any name you like
-Description: Udacity project 3 
-Repo Type: Public / Private
-Initialize this repository with:
-CHECK - Add a README file
-CHECK - Add .gitignore
-Select .gitignore Template: Terraform
-Click on Create repository
+    Copy files from Git-Repo-Files folder to local repo & Check-In Code
+    Repo will be empty except README file. Now you can download the startup files from the udacity and paste it here to work on. after finishing the work you can     push  the files to github to get into the azure pipeline to start executing the code. Follow the below command to push the chnages file.
 
-Clone Github Repository to Local Desktop
-# Clone Github Repo
-git clone https://github.com/<YOUR_GITHUB_ID>/<YOUR_REPO>.git
-git clone git@github.com:enam1977/Terraform_Pro3.git
-
-Copy files from Git-Repo-Files folder to local repo & Check-In Code
-Repo will be empty except README file. Now you can download the startup files from the udacity and paste it here to work on. after finishing the work you can push  the files to github to get into the azure pipeline to start executing the code. Follow the below command to push the chnages file.
-
-Check-In code to Remote Repository
-# GIT Status
+###### Check-In code to Remote Repository
+##### GIT Status
 git status
 
-# Git Local Commit
+##### Git Local Commit
 git add .
 git commit -am "First Commit"
 
-# Push to Remote Repository
+##### Push to Remote Repository
 git push
 
-# Verify the same on Remote Repository
+##### Verify the same on Remote Repository
 git@github.com:enam1977/Terraform_Pro3.git
 
 # Terraform in Azure

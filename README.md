@@ -671,6 +671,7 @@ Both ID and primary key of the Log Analytics Workspace can be found in the Setti
 After finishing installing the Log Analytics agent on the deployed VM, Settings >> Agents management should indicate that "1 Linux computers connected".
 
    ![](screenshot/Log analytic VM_CON.png)
+   
 
  # Collect custom logs with Log Analytics agent in Azure Monitor
 

@@ -367,7 +367,7 @@ resource "azurerm_linux_virtual_machine" "web_linuxvm" {
 * Rename the Pipeline file name to whatever you like or keep as it is
 * Build the below code using tasks listed below that will check the authentication and create resources.
 
-
+```
   trigger:
   branches:
     include:
@@ -557,7 +557,7 @@ stages:
                     appType: webApp
                     package: $(Pipeline.Workspace)/drop-fakerestapi/fakerestapi-$(Build.BuildId).zip
                     deploymentMethod: zipDeploy
-
+```
  * Build FakeRestAPI artifact by archiving the entire fakerestapi directory into a zip file and publishing the pipeline artifact to the artifact staging directory.
 
 * Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [https://webapp-webappservice.azurewebsites.net/] where `webapp-webappservice` is the Azure App Service deploy

@@ -699,14 +699,14 @@ yml file for selenium testing
 * Select add custom log
 * create a sample text file that contain the entry in the following format and upload and hit next
 
-- YYYY-MM-DD HH:MM:SS
-- M/D/YYYY HH:MM:SS AM/PM
-- Mon DD, YYYY HH:MM:SS
-- yyMMdd HH:mm:ss
-- ddMMyy HH:mm:ss
-- MMM d hh:mm:ss
-- dd/MMM/yyyy:HH:mm:ss zzz
-- yyyy-MM-ddTHH:mm:ssK
+      - YYYY-MM-DD HH:MM:SS
+      - M/D/YYYY HH:MM:SS AM/PM
+      - Mon DD, YYYY HH:MM:SS
+      - yyMMdd HH:mm:ss
+      - ddMMyy HH:mm:ss
+      - MMM d hh:mm:ss
+      - dd/MMM/yyyy:HH:mm:ss zzz
+      - yyyy-MM-ddTHH:mm:ssK
 
 * Select Record delimiter "New Line" and hit next
 * Select the  Type:linux and give a path wehre you want to see the log file.
@@ -721,8 +721,150 @@ yml file for selenium testing
 
 ![](./screenshot/selenium_logs.png)
 
-JMeter Command Line Options reference]
+###### For JMeter:
 
+* JMeter Command Line Options reference]
+      http://sqa.fyicenter.com/1000056_JMeter_Command_Line_Options.html
+* Use the starter APIs to create two Test Suites.Below yml file has created to get the result
+```
+- job: test_jmeter
+        displayName: Test JMeter
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - bash: |
+              sudo apt-get install openjdk-11-jre-headless -y
+              java -version
+              wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.tgz -O jmeter.tgz
+              tar xzvf jmeter.tgz
+              apache-jmeter-5.4/bin/jmeter --version
+              # create log directory
+              mkdir -p log/jmeter
+              pwd
+              ls -la
+            displayName: Install JMeter
+          - bash: |
+              apache-jmeter-5.4/bin/jmeter -n -t jmeter/stress-test.jmx \
+                                           -l log/jmeter/stress-test-result.csv \
+                                           -e -f -o log/jmeter/stress-test-html-report \
+                                           -j log/jmeter/jmeter-stress-test.log
+            displayName: JMeter stress test
+          - bash: |
+              apache-jmeter-5.4/bin/jmeter -n -t jmeter/endurance-test.jmx \
+                                           -l log/jmeter/endurance-test-result.csv \
+                                           -e -f -o log/jmeter/endurance-test-html-report \
+                                           -j log/jmeter/jmeter-endurance-test.log
+            displayName: JMeter endurance test
+          - task: ArchiveFiles@2
+            displayName: Archive JMeter stress test HTML report
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report-$(Build.BuildId).zip"
+              verbose: true
+          - task: ArchiveFiles@2
+            displayName: Archive JMeter endurance test HTML report
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report-$(Build.BuildId).zip"
+              verbose: true
+          - bash: |
+              rm -rf log/jmeter/stress-test-html-report
+              rm -rf log/jmeter/endurance-test-html-report
+              cd log/jmeter
+              pwd
+              ls -la
+            displayName: Delete original JMeter test HTML reports
+          - task: PublishPipelineArtifact@1
+            displayName: Publish JMeter logs
+            inputs:
+              targetPath: "$(System.DefaultWorkingDirectory)/log/jmeter"
+              artifactName: "drop-jmeter-logs"
+  ```
+* Create a Stress Test Suite
+   Below image shows Stress Test passed and completed
+   ![](./screenshot/stresstest.png)
+* Create a Endurance Test Suite
+   Below image shows Stress Test passed and completed
+   ![](./screenshot/endurance_test.png)
+   
+###### For Postman:
+ 
+* Use the Publish Test Results task to publish the test results to Azure Pipelines.
+```
+- job: test_newman
+        displayName: Test Postman (using Newman CLI)
+        pool:
+          vmImage: "ubuntu-18.04"
+        steps:
+          - task: NodeTool@0
+            displayName: Install Node 14.x
+            inputs:
+              versionSpec: "14.x"
 
+          - bash: |
+              npm install -g newman
+              newman -v
+              # create log dirctry
+              mkdir -p log/newman
+              pwd
+              ls -la
+            displayName: Install Newman
+          - bash: |
+              newman run postman/RegressionTest.json \
+                         -e postman/Proj3.postman_environment.json \
+                         -r cli,junit \
+                         --reporter-junit-export log/newman/regression-test.xml \
+                         --suppress-exit-code
+            displayName: Newman Regression Test
+          - bash: |
+              newman run postman/DataValidationTest.json \
+                         -e postman/Proj3.postman_environment.json \
+                         -r cli,junit \
+                         --reporter-junit-export log/newman/data-validation-test.xml \
+                         --suppress-exit-code
+              ls -la $(System.DefaultWorkingDirectory)/log/newman
+            displayName: Newman DataValidationTest Test
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Newman logs
+            inputs:
+              targetPath: "$(System.DefaultWorkingDirectory)/log/newman"
+              artifactName: "drop-newman-logs"
 
-http://sqa.fyicenter.com/1000056_JMeter_Command_Line_Options.html
+          - task: PublishTestResults@2
+            displayName: "Publish Newman test results"
+            inputs:
+              testRunner: "JUnit"
+              searchFolder: "$(System.DefaultWorkingDirectory)/log/newman"
+              testResultsFiles: "*.xml"
+              mergeTestResults: true
+              testRunTitle: "Publish Newman test results"
+              
+  ```
+#### Regression Test
+* Create a Regression Test Suite from the Starter APIs.
+* Apply the test suite in the azure pipeline through YML file.
+* Below image shows Regression Test passed and completed
+    ![](./screenshot/Newman_Regression_Test.png)
+
+#### Data Validation Test
+* Create a Data Validation Test Suite from the Starter APIs.
+* Apply the test suite in the azure pipeline through YML file.
+* Below image shows Data Validation Test passed and completed
+ ![](./screenshot/newman_validation_test.png)
+ 
+#### Postman Test Result
+ ![](./screenshot/postman_Test_result.png)
+ 
+###### For Azure Monitor:
+* Configure an Action Group (email)
+   - Sign in to the Azure portal at https://portal.azure.com>>APP Services>>
+   - click on the app service you have. Mine is webapp-webappserviceAlert
+   - monitoring>>alerts
+   - Create an alert rule>>put  condition>>set action to put email address>>Alert rule details>>Create alart rule
+
+![](./screenshot/mail_monitor.png)
+

@@ -337,13 +337,13 @@ Due to security issue, upload the following information Azure DevOps Pipeline Li
 
 https://github.com/enam1977/Terraform_Pro3/blob/main/screenshot/FAKE%20REST%20API_WEBAPP.png
 
-![credentials](./screenshot/credentials -azure-library.png)
+![credentials](./screenshot/credentials_azure_library.png)
 
 #  Create a new Service Connection
 
  Go Project Settings >> Service connections >> New service connection >> Azure Resource Manager >> Next >> Service Principal (Automatic) >> Next >> Choose the correct subscription, and name such new service connection to Azure Resource Manager as azurerm-sc. This name will be used in azure-pipelines.yml.
 
-/Users/enamulhaque/Documents/AzureDevops/Udacity/Project3/Terraform_Pro3/screenshot/service connection.png
+![](./screenshot/service_connection.png)
 
 # Create Azure CI (Continuous Integration) Pipeline (Build Pipeline)
 Go to Azure DevOps -> Organization (enambd) -> Project (terraform_Project3) -> Pipelines -> Pipelines
@@ -548,7 +548,7 @@ stages:
 Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [https://webapp-webappservice.azurewebsites.net/] where `webapp-webappservice` is the Azure App Service deploy
 
     
-   ![](./screenshot/FAKE REST API_WEBAPP.png)
+   ![](./screenshot/FAKE_REST_API_WEBAPP.png)
     
     
 # Environments virtual Machine
@@ -670,7 +670,7 @@ Both ID and primary key of the Log Analytics Workspace can be found in the Setti
 
 After finishing installing the Log Analytics agent on the deployed VM, Settings >> Agents management should indicate that "1 Linux computers connected".
 
-   ![](./screenshot/Log analytic VM_CON.png)
+   ![](./screenshot/Log_analytic_VM_CON.png)
    
 
  # Collect custom logs with Log Analytics agent in Azure Monitor
@@ -694,14 +694,14 @@ create a sample text file that contain the entry in the following format and upl
 Select Record delimiter "New Line" and hit next
 Select the  Type:linux and give a path wehre you want to see the log file.
 
-![](./screenshot/custom log.png)
+![](./screenshot/custom_log.png)
 
 Referance:
 https://docs.microsoft.com/en-us/azure/azure-monitor/agents/data-sources-custom-logs
 
 # Verify Azure Monitor Logs collected from the Log Analytics agent installed on the deployed VM.
 
-![](./screenshot/selenium logs.png)
+![](./screenshot/selenium_logs.png)
 
 JMeter Command Line Options reference]
 

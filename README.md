@@ -563,8 +563,8 @@ stages:
 
 * Deploy FakeRestAPI artifact to the terraform deployed Azure App Service. The deployed webapp URL is [https://webapp-webappservice.azurewebsites.net/] where `webapp-webappservice` is the Azure App Service deploy
 
+     ![](./screenshot/FAKE REST_API_WEBAPP.png)
     
-   ![](./screenshot/FAKE_REST_API_WEBAPP.png)
     
     
 ###### Environments virtual Machine
